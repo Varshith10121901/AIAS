@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — AIAS</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/signin.css') }}">
+</head>
+<body>
+    <div class="split-layout">
+        <!-- Left Side: Information & Marketing -->
+        <div class="split-info">
+            <div class="info-content">
+                <h4 class="info-eyebrow">AI SAAS PLATFORM FOR BUSINESS AUTOMATION</h4>
+                <h1 class="info-heading">Build Smarter.<br>Scale Faster.</h1>
+                <p class="info-subtext">AIAS helps businesses automate workflows, deploy intelligent AI systems, and unlock real-time decision making — all from one platform.</p>
+                
+                <div class="info-features">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                                <circle cx="12" cy="12" r="4"/>
+                            </svg>
+                        </div>
+                        <span>Intelligent Automation</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 3v18h18"/>
+                                <path d="M18 9l-5 5-4-4-5 5"/>
+                                <circle cx="18" cy="9" r="2"/>
+                                <circle cx="13" cy="14" r="2"/>
+                                <circle cx="9" cy="10" r="2"/>
+                            </svg>
+                        </div>
+                        <span>Real-Time Business Insights</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                <path d="M9 12l2 2 4-4"/>
+                            </svg>
+                        </div>
+                        <span>Enterprise-Grade Security</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                                <polyline points="2 12 12 17 22 12"/>
+                                <polyline points="2 17 12 22 22 17"/>
+                            </svg>
+                        </div>
+                        <span>Built to Scale Globally</span>
+                    </div>
+                </div>
+                
+                <div class="info-footer">
+                    <p>The future of business runs on intelligence.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Auth Form -->
+        <div class="split-auth">
+            <div class="auth-background">
+                <div class="grid-overlay"></div>
+            </div>
+            <div class="toast-container"></div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message" data-message="{{ message }}" data-type="{{ category }}" style="display:none;"></div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="auth-container">
+        <div class="auth-card">
+            <div class="dashboard-container">
+                <div class="dashboard-avatar">
+                    {{ user_name[0].upper() if user_name else '?' }}
+                </div>
+                <h1 class="dashboard-title">Welcome, {{ user_name }}! 🎉</h1>
+                <p class="dashboard-email">{{ user_email }}</p>
+                <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 32px; line-height: 1.6;">
+                    You have successfully signed in with email verification.<br>
+                    Your session is active and secure.
+                </p>
+                <a href="{{ url_for('auth.signout') }}" class="btn-signout">
+                    🚪 Sign Out
+                </a>
+            </div>
+        </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/auth_features.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/signin.js') }}"></script>
+</body>
+</html>

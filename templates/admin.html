@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — AIAS</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        :root{
+            --bg:#08080a;--bg2:#0e0e12;--bg3:#151519;--bg4:#1c1c22;
+            --border:#222228;--border2:#2a2a32;
+            --text:#f0ede8;--text2:#a09a94;--text3:#6a6560;
+            --gold:#D4AF37;--gold2:#B88912;--gold-glow:rgba(212,175,55,.15);
+            --green:#4ade80;--red:#f87171;--blue:#60a5fa;--purple:#a78bfa;--cyan:#22d3ee;
+            --sans:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+            --mono:'JetBrains Mono',monospace;
+            --radius:14px;
+        }
+        body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+        a{color:var(--gold);text-decoration:none}
+
+        /* ═══ Top Bar ═══ */
+        .topbar{position:sticky;top:0;z-index:100;background:rgba(8,8,10,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between}
+        .topbar-l{display:flex;align-items:center;gap:14px}
+        .topbar-logo{font-family:Georgia,serif;font-size:20px;color:var(--text)}
+        .topbar-logo span{color:var(--gold)}
+        .topbar-badge{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:var(--gold);color:#0A0A0A;padding:3px 10px;border-radius:4px}
+        .topbar-r{display:flex;align-items:center;gap:16px}
+        .topbar-user{font-size:13px;color:var(--text2)}
+        .topbar-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:500;padding:7px 16px;border-radius:8px;cursor:pointer;transition:all .15s;text-decoration:none}
+        .topbar-btn:hover{background:rgba(255,255,255,.1);color:var(--text);border-color:var(--border2)}
+
+        /* ═══ Layout ═══ */
+        .admin-layout{max-width:1400px;margin:0 auto;padding:28px 32px 60px}
+
+        /* ═══ Stats Row ═══ */
+        .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
+        .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
+        .stat-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+        .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:.5}
+        .stat-card:nth-child(1)::before{background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+        .stat-card:nth-child(2)::before{background:linear-gradient(90deg,transparent,var(--blue),transparent)}
+        .stat-card:nth-child(3)::before{background:linear-gradient(90deg,transparent,var(--green),transparent)}
+        .stat-card:nth-child(4)::before{background:linear-gradient(90deg,transparent,var(--purple),transparent)}
+        .stat-label{font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+        .stat-value{font-size:34px;font-weight:700;color:var(--text);line-height:1.1;font-family:var(--mono)}
+        .stat-sub{font-size:12px;color:var(--text3);margin-top:6px}
+        .stat-icon{position:absolute;top:18px;right:20px;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+        .stat-card:nth-child(1) .stat-icon{background:var(--gold-glow)}
+        .stat-card:nth-child(2) .stat-icon{background:rgba(96,165,250,.12)}
+        .stat-card:nth-child(3) .stat-icon{background:rgba(74,222,128,.12)}
+        .stat-card:nth-child(4) .stat-icon{background:rgba(167,139,250,.12)}
+        .stat-icon svg{width:18px;height:18px;fill:none;stroke-width:2}
+        .stat-card:nth-child(1) .stat-icon svg{stroke:var(--gold)}
+        .stat-card:nth-child(2) .stat-icon svg{stroke:var(--blue)}
+        .stat-card:nth-child(3) .stat-icon svg{stroke:var(--green)}
+        .stat-card:nth-child(4) .stat-icon svg{stroke:var(--purple)}
+
+        /* ═══ Tab Navigation ═══ */
+        .tab-nav{display:flex;gap:4px;margin-bottom:24px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:4px;overflow-x:auto}
+        .tab-btn{background:transparent;border:none;color:var(--text3);font-family:var(--sans);font-size:13px;font-weight:500;padding:10px 20px;border-radius:8px;cursor:pointer;transition:all .18s;white-space:nowrap;display:flex;align-items:center;gap:8px}
+        .tab-btn:hover{color:var(--text2);background:rgba(255,255,255,.04)}
+        .tab-btn.active{background:var(--bg4);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+        .tab-btn .tab-count{font-size:10px;font-weight:600;background:rgba(255,255,255,.08);padding:2px 7px;border-radius:8px;color:var(--text3)}
+        .tab-btn.active .tab-count{background:var(--gold-glow);color:var(--gold)}
+
+        /* ═══ Tab Panel ═══ */
+        .tab-panel{display:none;animation:fadeIn .25s ease}
+        .tab-panel.active{display:block}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+        /* ═══ Section Card ═══ */
+        .section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+        .section-head{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+        .section-title{font-size:15px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:10px}
+        .section-title .dot{width:8px;height:8px;border-radius:50%}
+        .section-title .dot-gold{background:var(--gold)}
+        .section-title .dot-blue{background:var(--blue)}
+        .section-title .dot-green{background:var(--green)}
+        .section-title .dot-red{background:var(--red)}
+        .section-title .dot-purple{background:var(--purple)}
+        .section-count{font-size:11px;font-weight:500;color:var(--text3);background:var(--bg4);padding:3px 10px;border-radius:12px}
+
+        /* ═══ Table ═══ */
+        .data-table{width:100%;border-collapse:collapse}
+        .data-table th{text-align:left;padding:12px 20px;font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);background:var(--bg3);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:1}
+        .data-table td{padding:14px 20px;font-size:13px;color:var(--text2);border-bottom:1px solid rgba(255,255,255,.03)}
+        .data-table tr:hover td{background:rgba(255,255,255,.02);color:var(--text)}
+        .data-table tr:last-child td{border-bottom:none}
+        .table-wrap{max-height:520px;overflow-y:auto;overflow-x:auto}
+        .table-wrap::-webkit-scrollbar{width:4px}
+        .table-wrap::-webkit-scrollbar-thumb{background:#333;border-radius:4px}
+
+        /* Badges */
+        .badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;letter-spacing:.03em}
+        .badge-gold{background:rgba(212,175,55,.12);color:var(--gold)}
+        .badge-green{background:rgba(74,222,128,.12);color:var(--green)}
+        .badge-red{background:rgba(248,113,113,.12);color:var(--red)}
+        .badge-blue{background:rgba(96,165,250,.12);color:var(--blue)}
+        .badge-purple{background:rgba(167,139,250,.12);color:var(--purple)}
+        .badge-cyan{background:rgba(34,211,238,.12);color:var(--cyan)}
+        .badge-gray{background:rgba(255,255,255,.06);color:var(--text3)}
+
+        /* ═══ Problem cards ═══ */
+        .problem-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;padding:20px}
+        .problem-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:18px 20px;transition:border-color .15s}
+        .problem-card:hover{border-color:var(--border2)}
+        .problem-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+        .problem-card-name{font-size:14px;font-weight:600;color:var(--text)}
+        .problem-card-service{flex-shrink:0}
+        .problem-card-body{font-size:13px;line-height:1.65;color:var(--text2);word-break:break-word}
+
+        /* ═══ Empty ═══ */
+        .empty{padding:56px 24px;text-align:center;color:var(--text3);font-size:14px}
+        .empty-icon{font-size:36px;margin-bottom:12px;opacity:.4}
+
+        /* ═══ Responsive ═══ */
+        @media(max-width:1024px){
+            .stats-row{grid-template-columns:repeat(2,1fr)}
+            .problem-grid{grid-template-columns:1fr}
+        }
+        @media(max-width:640px){
+            .admin-layout{padding:16px}
+            .stats-row{grid-template-columns:1fr}
+            .topbar{padding:0 16px}
+            .topbar-user{display:none}
+            .tab-nav{border-radius:10px}
+            .tab-btn{padding:8px 14px;font-size:12px}
+            .data-table td,.data-table th{padding:10px 14px;font-size:12px}
+        }
+    </style>
+</head>
+<body>
+    <!-- ═══ Top Bar ═══ -->
+    <header class="topbar">
+        <div class="topbar-l">
+            <div class="topbar-logo" style="display:flex;align-items:center;gap:8px;">
+                <img src="/static/images/logo.png" alt="AIAS Logo" style="height:28px;width:28px;object-fit:contain;border-radius:4px;" />
+                <span>AIAS<span>Admin</span></span>
+            </div>
+            <span class="topbar-badge">Dashboard</span>
+        </div>
+        <div class="topbar-r">
+            <span class="topbar-user">{{ admin_email }}</span>
+            <a href="{{ url_for('index') }}" class="topbar-btn">← Back to Site</a>
+            <a href="{{ url_for('auth.signout') }}" class="topbar-btn">Sign Out</a>
+        </div>
+    </header>
+
+    <div class="admin-layout">
+        <!-- ═══ Stat Cards ═══ -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+                <div class="stat-label">Total Users</div>
+                <div class="stat-value">{{ total_users }}</div>
+                <div class="stat-sub">{{ verified_users }} verified · {{ google_users }} via Google</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                <div class="stat-label">Call Bookings</div>
+                <div class="stat-value">{{ total_bookings }}</div>
+                <div class="stat-sub">{{ booked_count }} booked · {{ new_count }} new leads</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <div class="stat-label">Active Sessions</div>
+                <div class="stat-value">{{ active_sessions }}</div>
+                <div class="stat-sub">currently logged in</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                <div class="stat-label">OTP Requests</div>
+                <div class="stat-value">{{ total_otps }}</div>
+                <div class="stat-sub">verification codes sent</div>
+            </div>
+        </div>
+
+        <!-- ═══ Tab Navigation ═══ -->
+        <div class="tab-nav" role="tablist">
+            <button class="tab-btn active" data-tab="leads" role="tab" aria-selected="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Leads & Bookings
+                <span class="tab-count">{{ total_bookings }}</span>
+            </button>
+            <button class="tab-btn" data-tab="users" role="tab" aria-selected="false">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Users
+                <span class="tab-count">{{ total_users }}</span>
+            </button>
+            <button class="tab-btn" data-tab="requirements" role="tab" aria-selected="false">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                What Users Asked
+                <span class="tab-count">{{ bookings_with_problems|length }}</span>
+            </button>
+            <button class="tab-btn" data-tab="security" role="tab" aria-selected="false">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Security Logs
+                <span class="tab-count">{{ rate_logs|length }}</span>
+            </button>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- TAB 1: Leads & Bookings                    -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="tab-panel active" id="tab-leads" role="tabpanel">
+            <div class="section">
+                <div class="section-head">
+                    <div class="section-title"><span class="dot dot-gold"></span>Call Bookings / Leads</div>
+                    <span class="section-count">{{ total_bookings }} total</span>
+                </div>
+                {% if bookings %}
+                <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>WhatsApp</th>
+                            <th>Service</th>
+                            <th>Budget</th>
+                            <th>Timeline</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in bookings %}
+                        <tr>
+                            <td style="color:var(--text3);font-family:var(--mono);">{{ b.id }}</td>
+                            <td style="color:var(--text);font-weight:500;">{{ b.name }}</td>
+                            <td><a href="mailto:{{ b.email }}">{{ b.email }}</a></td>
+                            <td>{{ b.whatsapp or '—' }}</td>
+                            <td><span class="badge badge-gold">{{ b.service_needed or 'N/A' }}</span></td>
+                            <td>{{ b.budget_range or '—' }}</td>
+                            <td>{{ b.timeline or '—' }}</td>
+                            <td>
+                                {% if b.lead_status == 'booked' %}
+                                    <span class="badge badge-green">Booked</span>
+                                {% elif b.lead_status == 'new' %}
+                                    <span class="badge badge-blue">New</span>
+                                {% else %}
+                                    <span class="badge badge-gray">{{ b.lead_status }}</span>
+                                {% endif %}
+                            </td>
+                            <td style="font-size:12px;color:var(--text3);font-family:var(--mono);">{{ b.created_at[:16] if b.created_at else '—' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+                {% else %}
+                <div class="empty">
+                    <div class="empty-icon">📭</div>
+                    No bookings yet. Leads from the chatbot will appear here.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- TAB 2: Users                               -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="tab-panel" id="tab-users" role="tabpanel">
+            <div class="section">
+                <div class="section-head">
+                    <div class="section-title"><span class="dot dot-blue"></span>Registered Users</div>
+                    <span class="section-count">{{ total_users }} total</span>
+                </div>
+                {% if users %}
+                <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Auth Type</th>
+                            <th>Status</th>
+                            <th>Failed Logins</th>
+                            <th>Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <td style="color:var(--text3);font-family:var(--mono);">{{ u.id }}</td>
+                            <td style="color:var(--text);font-weight:500;">{{ u.display_name or '—' }}</td>
+                            <td>{{ u.email }}</td>
+                            <td>
+                                {% if u.is_google_user %}
+                                    <span class="badge badge-cyan">Google</span>
+                                {% else %}
+                                    <span class="badge badge-purple">Email + Password</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if u.is_verified %}
+                                    <span class="badge badge-green">Verified</span>
+                                {% else %}
+                                    <span class="badge badge-red">Unverified</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if u.failed_login_attempts and u.failed_login_attempts > 0 %}
+                                    <span class="badge badge-red">{{ u.failed_login_attempts }}</span>
+                                {% else %}
+                                    <span style="color:var(--text3);">0</span>
+                                {% endif %}
+                            </td>
+                            <td style="font-size:12px;color:var(--text3);font-family:var(--mono);">{{ u.created_at[:16] if u.created_at else '—' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+                {% else %}
+                <div class="empty">
+                    <div class="empty-icon">👥</div>
+                    No users registered yet.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- TAB 3: What Users Asked                    -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="tab-panel" id="tab-requirements" role="tabpanel">
+            <div class="section">
+                <div class="section-head">
+                    <div class="section-title"><span class="dot dot-green"></span>User Requirements & Problems</div>
+                    <span class="section-count">{{ bookings_with_problems|length }} entries</span>
+                </div>
+                {% if bookings_with_problems %}
+                <div class="problem-grid">
+                    {% for b in bookings_with_problems %}
+                    <div class="problem-card">
+                        <div class="problem-card-head">
+                            <div class="problem-card-name">{{ b.name }}</div>
+                            <div class="problem-card-service"><span class="badge badge-gold">{{ b.service_needed or 'N/A' }}</span></div>
+                        </div>
+                        <div class="problem-card-body">{{ b.problem_statement }}</div>
+                        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+                            {% if b.budget_range %}<span class="badge badge-purple">{{ b.budget_range }}</span>{% endif %}
+                            {% if b.timeline %}<span class="badge badge-blue">{{ b.timeline }}</span>{% endif %}
+                            {% if b.email %}<span class="badge badge-gray">{{ b.email }}</span>{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty">
+                    <div class="empty-icon">📝</div>
+                    No user requirements captured yet. Problem statements from the chatbot will show here as cards.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- TAB 4: Security Logs                       -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="tab-panel" id="tab-security" role="tabpanel">
+            <div class="section">
+                <div class="section-head">
+                    <div class="section-title"><span class="dot dot-red"></span>Security & Rate Limit Logs</div>
+                    <span class="section-count">{{ rate_logs|length }} entries</span>
+                </div>
+                {% if rate_logs %}
+                <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Action</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in rate_logs %}
+                        <tr>
+                            <td>{{ r.email }}</td>
+                            <td>
+                                {% if 'failed' in r.action %}
+                                    <span class="badge badge-red">{{ r.action }}</span>
+                                {% elif 'success' in r.action %}
+                                    <span class="badge badge-green">{{ r.action }}</span>
+                                {% elif 'otp' in r.action %}
+                                    <span class="badge badge-purple">{{ r.action }}</span>
+                                {% else %}
+                                    <span class="badge badge-gray">{{ r.action }}</span>
+                                {% endif %}
+                            </td>
+                            <td style="font-size:12px;color:var(--text3);font-family:var(--mono);">{{ r.created_at[:19] if r.created_at else '—' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+                {% else %}
+                <div class="empty">
+                    <div class="empty-icon">🛡️</div>
+                    No security logs recorded yet.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Deactivate all
+                document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                // Activate clicked
+                btn.classList.add('active');
+                btn.setAttribute('aria-selected','true');
+                const panel = document.getElementById('tab-' + btn.dataset.tab);
+                if (panel) panel.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

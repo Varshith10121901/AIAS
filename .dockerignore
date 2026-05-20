@@ -1,0 +1,35 @@
+# Git
+.env
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# Docker
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
+
+# Kubernetes
+k8s/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Misc
+*.log
+.git/
+.gitignore
+README.md
+LICENSE

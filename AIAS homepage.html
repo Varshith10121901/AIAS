@@ -1,0 +1,2869 @@
+<!DOCTYPE html>
+<html lang="en" class="intro-lock">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIAS | AI SaaS Platform for Business Automation</title>
+  <meta name="description" content="AIAS is a B2B AI SaaS platform that helps teams deploy AI agents, automate workflows, and scale enterprise AI operations with real-time analytics." />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=DM+Sans:wght@300;400;500;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --ds-black: #0A0A0A;
+      --ds-white: #FFFFFF;
+      --ds-soft: #F9F7F2;
+      --ds-gold: #D4AF37;
+      --ds-gold-deep: #B88912;
+      --ds-muted: #646464;
+      --ds-line: rgba(0,0,0,0.08);
+      --page-max: 1280px;
+      --page-pad: clamp(1rem, 3vw, 2.75rem);
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    html.intro-lock,
+    body.intro-lock {
+      overflow: hidden;
+      height: 100%;
+      overscroll-behavior: none;
+    }
+    body.intro-lock {
+      touch-action: none;
+    }
+    body { font-family: var(--sans); background: var(--ds-white); color: var(--ds-black); }
+
+    .site {
+      width: 100%;
+      min-height: 100vh;
+      background: var(--ds-white);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 600ms ease, transform 600ms ease;
+    }
+    .site.ready {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .cinematic-intro {
+      position: fixed;
+      inset: 0;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      overflow: hidden;
+      transition: opacity 320ms ease, visibility 320ms ease;
+      perspective: 1200px;
+    }
+    .cinematic-intro::before {
+      content: "";
+      position: absolute;
+      width: 60vmax;
+      height: 60vmax;
+      background: radial-gradient(circle, rgba(212,175,55,0.22) 0%, rgba(212,175,55,0.08) 36%, rgba(212,175,55,0) 70%);
+      top: -32vmax;
+      right: -18vmax;
+      animation: haloDrift 7s ease-in-out infinite;
+    }
+    .cinematic-intro::after {
+      content: "";
+      position: absolute;
+      width: 52vmax;
+      height: 52vmax;
+      background: radial-gradient(circle, rgba(212,175,55,0.16) 0%, rgba(212,175,55,0) 68%);
+      bottom: -30vmax;
+      left: -18vmax;
+      animation: haloDrift 7s ease-in-out infinite 1.2s;
+    }
+    .intro-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .aias-stage {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      transform-style: preserve-3d;
+      animation: floatStage 5.5s ease-in-out infinite;
+      padding: 1rem;
+    }
+    .aias-text {
+      font-family: var(--serif);
+      font-size: clamp(62px, 9.6vw, 132px);
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      color: var(--ds-black);
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 0;
+      opacity: 0;
+      transform: translateY(10px) scale(0.98);
+      text-shadow: none;
+      animation: introWordEase 560ms cubic-bezier(0.22, 1, 0.36, 1) forwards 120ms;
+    }
+    .aias-glow {
+      margin-top: 0.45rem;
+      font-family: var(--serif);
+      color: var(--ds-black);
+      font-size: clamp(15px, 2vw, 22px);
+      font-weight: 400;
+      line-height: 1.18;
+      letter-spacing: 0.04em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.1rem;
+      width: max-content;
+      margin-left: auto;
+      margin-right: auto;
+      text-shadow: none;
+      opacity: 0;
+      transform: translateY(8px);
+      animation: introSubEase 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards 620ms;
+    }
+    .aias-letter,
+    .aias-sub-word {
+      display: inline-block;
+      backface-visibility: hidden;
+    }
+    .aias-sub-line {
+      display: flex;
+      align-items: baseline;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      gap: 0.35em;
+      width: 100%;
+    }
+    .gold-text {
+      color: var(--ds-gold);
+    }
+    .black-text {
+      color: var(--ds-black);
+    }
+    .skip-intro {
+      position: absolute;
+      right: 2rem;
+      bottom: 2rem;
+      border: 0.5px solid rgba(212,175,55,0.8);
+      background: rgba(255,255,255,0.98);
+      color: #9f760c;
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+
+    .site > nav,
+    .site > .hero,
+    .site > .tagline-band,
+    .site > .problems,
+    .site > .solutions,
+    .site > .how-it-works,
+    .site > .use-cases,
+    .site > .live-demo,
+    .site > .keywords-section,
+    .site > .pricing,
+    .site > .results,
+    .site > .seo-block,
+    .site > .cta-final,
+    .site > footer {
+      padding-left: max(var(--page-pad), calc((100vw - var(--page-max)) / 2));
+      padding-right: max(var(--page-pad), calc((100vw - var(--page-max)) / 2));
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+      background: rgba(255,255,255,0.94);
+      border-bottom: 0.5px solid var(--ds-line);
+      backdrop-filter: blur(10px);
+    }
+    .logo {
+      font-family: var(--serif);
+      font-size: 22px;
+      letter-spacing: 0.04em;
+    }
+    .logo span { color: var(--ds-gold); }
+    nav ul {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 1.35rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    nav a {
+      text-decoration: none;
+      color: var(--ds-muted);
+      font-size: 13px;
+      letter-spacing: 0.03em;
+    }
+    nav a:hover { color: var(--ds-black); }
+    .nav-cta {
+      background: var(--ds-black);
+      color: var(--ds-white);
+      padding: 8px 16px;
+      border-radius: 2px;
+      border: 0.5px solid var(--ds-black);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .nav-cta:hover {
+      color: var(--ds-white);
+      background: var(--ds-gold-deep);
+      border-color: var(--ds-gold-deep);
+    }
+    .hero {
+      padding-top: 4.2rem;
+      padding-bottom: 3.4rem;
+      border-bottom: 0.5px solid var(--ds-line);
+      background:
+        radial-gradient(circle at 88% 4%, rgba(212,175,55,0.12), rgba(212,175,55,0) 36%),
+        #fff;
+    }
+    .hero-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ds-gold-deep);
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .hero-eyebrow::before {
+      content: "";
+      width: 28px;
+      height: 0.5px;
+      background: var(--ds-gold-deep);
+      display: block;
+    }
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(42px, 6vw, 72px);
+      line-height: 1.04;
+      letter-spacing: -0.015em;
+      font-weight: 300;
+      max-width: 900px;
+      margin-bottom: 1.3rem;
+    }
+    .hero-sub {
+      max-width: 780px;
+      font-size: 17px;
+      color: var(--ds-muted);
+      line-height: 1.75;
+      margin-bottom: 1.3rem;
+    }
+    .hero-use-case {
+      font-size: 13px;
+      color: #4f4f4f;
+      margin-bottom: 2.2rem;
+      padding: 10px 12px;
+      border-left: 2px solid var(--ds-gold);
+      background: #fffdf7;
+      max-width: 780px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 0.9rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 2.8rem;
+    }
+    .btn-primary,
+    .btn-secondary {
+      padding: 12px 20px;
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .btn-primary {
+      border: 0.5px solid var(--ds-black);
+      background: var(--ds-black);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--ds-gold-deep);
+      border-color: var(--ds-gold-deep);
+    }
+    .btn-secondary {
+      border: 0.5px solid var(--ds-gold-deep);
+      background: #fff;
+      color: var(--ds-gold-deep);
+    }
+    .btn-secondary:hover {
+      background: var(--ds-soft);
+    }
+    .hero-metric-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1rem;
+      padding-top: 1.5rem;
+      border-top: 0.5px solid var(--ds-line);
+    }
+    .metric {
+      border: 0.5px solid var(--ds-line);
+      background: #fff;
+      padding: 1rem;
+    }
+    .metric-val {
+      font-family: var(--serif);
+      font-size: 32px;
+      line-height: 1;
+      color: #101010;
+    }
+    .metric-label {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--ds-muted);
+      letter-spacing: 0.04em;
+    }
+
+    .tagline-band {
+      padding-top: 1.6rem;
+      padding-bottom: 1.6rem;
+      border-bottom: 0.5px solid var(--ds-line);
+      background: #fff9ea;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    .tagline-band p {
+      font-family: var(--serif);
+      font-size: 24px;
+      font-weight: 300;
+      color: #3f3315;
+      max-width: 700px;
+      line-height: 1.3;
+    }
+    .band-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--ds-gold-deep);
+      text-align: right;
+      line-height: 1.6;
+    }
+
+    .problems,
+    .solutions,
+    .how-it-works,
+    .use-cases,
+    .live-demo,
+    .keywords-section,
+    .pricing,
+    .results,
+    .seo-block,
+    .cta-final,
+    footer,
+    .hero,
+    .tagline-band {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 560ms ease, transform 560ms ease;
+    }
+    .in-view {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal .problem-item,
+    .reveal .feature-card,
+    .reveal .how-card,
+    .reveal .use-card,
+    .reveal .demo-panel,
+    .reveal .price-card,
+    .reveal .result-metric,
+    .reveal .sales-card,
+    .reveal .testimonial,
+    .reveal .logo-pill {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 560ms ease, transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal.in-view .problem-item,
+    .reveal.in-view .feature-card,
+    .reveal.in-view .how-card,
+    .reveal.in-view .use-card,
+    .reveal.in-view .demo-panel,
+    .reveal.in-view .price-card,
+    .reveal.in-view .result-metric,
+    .reveal.in-view .sales-card,
+    .reveal.in-view .testimonial,
+    .reveal.in-view .logo-pill {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal.in-view .problem-item:nth-child(1),
+    .reveal.in-view .feature-card:nth-child(1),
+    .reveal.in-view .how-card:nth-child(1),
+    .reveal.in-view .use-card:nth-child(1),
+    .reveal.in-view .price-card:nth-child(1),
+    .reveal.in-view .result-metric:nth-child(1),
+    .reveal.in-view .sales-card:nth-child(1),
+    .reveal.in-view .testimonial:nth-child(1),
+    .reveal.in-view .logo-pill:nth-child(1) { transition-delay: 80ms; }
+    .reveal.in-view .problem-item:nth-child(2),
+    .reveal.in-view .feature-card:nth-child(2),
+    .reveal.in-view .how-card:nth-child(2),
+    .reveal.in-view .use-card:nth-child(2),
+    .reveal.in-view .price-card:nth-child(2),
+    .reveal.in-view .result-metric:nth-child(2),
+    .reveal.in-view .sales-card:nth-child(2),
+    .reveal.in-view .testimonial:nth-child(2),
+    .reveal.in-view .logo-pill:nth-child(2) { transition-delay: 150ms; }
+    .reveal.in-view .problem-item:nth-child(3),
+    .reveal.in-view .feature-card:nth-child(3),
+    .reveal.in-view .how-card:nth-child(3),
+    .reveal.in-view .use-card:nth-child(3),
+    .reveal.in-view .price-card:nth-child(3),
+    .reveal.in-view .result-metric:nth-child(3),
+    .reveal.in-view .sales-card:nth-child(3),
+    .reveal.in-view .testimonial:nth-child(3),
+    .reveal.in-view .logo-pill:nth-child(3) { transition-delay: 220ms; }
+    .reveal.in-view .problem-item:nth-child(4),
+    .reveal.in-view .feature-card:nth-child(4),
+    .reveal.in-view .how-card:nth-child(4),
+    .reveal.in-view .use-card:nth-child(4),
+    .reveal.in-view .logo-pill:nth-child(4) { transition-delay: 290ms; }
+    .reveal.in-view .logo-pill:nth-child(5) { transition-delay: 340ms; }
+    .reveal.in-view .logo-pill:nth-child(6) { transition-delay: 390ms; }
+    .reveal.in-view .logo-pill:nth-child(7) { transition-delay: 440ms; }
+
+    .section-tag {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--ds-gold-deep);
+      margin-bottom: 1.3rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-tag::before {
+      content: "";
+      width: 24px;
+      height: 0.5px;
+      background: var(--ds-gold-deep);
+      display: block;
+    }
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(30px, 4vw, 48px);
+      font-weight: 300;
+      line-height: 1.15;
+      margin-bottom: 0.9rem;
+    }
+    .section-copy {
+      color: var(--ds-muted);
+      line-height: 1.75;
+      font-size: 15px;
+      max-width: 860px;
+    }
+
+    .problems {
+      padding-top: 3.1rem;
+      padding-bottom: 3.1rem;
+      border-bottom: 0.5px solid var(--ds-line);
+    }
+    .problem-grid {
+      margin-top: 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--ds-line);
+    }
+    .problem-item {
+      background: #fff;
+      padding: 1.5rem;
+      border: 0.5px solid transparent;
+    }
+    .problem-item:hover { border-color: rgba(212,175,55,0.36); }
+    .problem-num {
+      font-family: var(--serif);
+      color: var(--ds-gold-deep);
+      margin-bottom: 0.6rem;
+      font-size: 12px;
+    }
+    .problem-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+    }
+    .problem-body {
+      color: var(--ds-muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .solutions {
+      padding-top: 3.1rem;
+      padding-bottom: 3.1rem;
+      border-bottom: 0.5px solid var(--ds-line);
+      background: #fcfbf7;
+    }
+    .feature-grid {
+      margin-top: 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .feature-card {
+      border: 0.5px solid var(--ds-line);
+      background: #fff;
+      padding: 1.35rem;
+    }
+    .feature-name {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 0.45rem;
+    }
+    .feature-benefit {
+      font-size: 14px;
+      color: var(--ds-muted);
+      line-height: 1.7;
+      margin-bottom: 0.75rem;
+    }
+    .feature-outcome {
+      display: inline-block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ds-gold-deep);
+      border: 0.5px solid rgba(212,175,55,0.6);
+      padding: 4px 8px;
+    }
+
+    .how-it-works {
+      padding-top: 3.1rem;
+      padding-bottom: 3.1rem;
+      border-bottom: 0.5px solid var(--ds-line);
+      background: #fff;
+    }
+    .how-grid {
+      margin-top: 1.9rem;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+    .how-card {
+      border: 0.5px solid var(--ds-line);
+      padding: 1.35rem;
+      background: #fff;
+    }
+    .how-step {
+      font-family: var(--serif);
+      color: var(--ds-gold-deep);
+      font-size: 14px;
+      margin-bottom: 0.45rem;
+    }
+    .how-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 0.45rem;
+      line-height: 1.35;
+    }
+    .how-body {
+      color: var(--ds-muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .use-cases {
+      padding-top: 3.1rem;
+      padding-bottom: 3.1rem;
+      border-bottom: 0.5px solid var(--ds-line);
+    }
+    .use-grid {
+      margin-top: 1.9rem;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+    .use-card {
+      border: 0.5px solid var(--ds-line);
+      background: #fff;
+      padding: 1.35rem;
+    }
+    .use-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 0.45rem;
+    }
+    .use-body {
+      color: var(--ds-muted);
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 0.8rem;
+    }
+    .use-result {
+      color: #3c3c3c;
+      font-size: 13px;
+      font-weight: 500;
+      background: #fff9ea;
+      border-left: 2px solid var(--ds-gold);
+      padding: 8px 10px;
+    }
+
+    .live-demo {
+      padding-top: 3.1rem;
+      padding-bottom: 3.1rem;
+      border-bottom: 0.5px solid var(--ds-line);
+      background: #fcfbf7;
+    }
+    .demo-shell {
+      margin-top: 1.6rem;
+      border: 0.5px solid var(--ds-line);
+      background: #fff;
+      padding: 1rem;
+    }
+    .demo-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      border-bottom: 0.5px solid var(--ds-line);
+      padding-bottom: 0.8rem;
+      margin-bottom: 0.9rem;
+      flex-wrap: wrap;
+    }
+    .demo-title {
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--ds-gold-deep);
+      font-weight: 600;
+    }
+    .demo-status {
+      font-size: 12px;
+      color: #426b1f;
+      background: #f0f8e9;
+      border: 0.5px solid #d5e8c8;
+      padding: 5px 10px;
+    }
+    .demo-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 1rem;
+    }
+    .demo-panel {
+      border: 0.5px solid var(--ds-line);
+      padding: 1rem;
+      background: #fff;
+      min-height: 220px;
+    }
+    .demo-panel h4 {
+      font-size: 16px;
+      margin-bottom: 0.6rem;
+    }
+    .demo-panel p {
+      color: var(--ds-muted);
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 0.8rem;
+    }
+    .demo-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+    .demo-list li {
+      font-size: 13px;
+      color: #3e3e3e;
+      padding: 8px 10px;
+      background: #fff9ea;
+      border-left: 2px solid var(--ds-gold);
+    }
+    .demo-actions {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+    }
+
+    .demo-workspace {
+      display: none;
+      min-height: 100vh;
+      background: #fff;
+      color: var(--ds-black);
+    }
+    .demo-workspace.show {
+      display: block;
+      animation: workspaceIn 420ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .demo-workspace-head {
+      position: sticky;
+      top: 0;
+      z-index: 25;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem max(var(--page-pad), calc((100vw - var(--page-max)) / 2));
+      background: rgba(255,255,255,0.94);
+      border-bottom: 0.5px solid var(--ds-line);
+      backdrop-filter: blur(10px);
+    }
+    .demo-workspace-brand {
+      font-family: var(--serif);
+      font-size: 22px;
+      letter-spacing: 0.04em;
+    }
+    .demo-workspace-brand span {
+      color: var(--ds-gold);
+    }
+    .demo-workspace-actions {
+      display: flex;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .demo-workspace-body {
+      padding: 2.2rem max(var(--page-pad), calc((100vw - var(--page-max)) / 2)) 3rem;
+    }
+    .demo-workspace-intro {
+      max-width: 880px;
+      margin-bottom: 1.4rem;
+    }
+    .demo-workspace-intro h2 {
+      font-family: var(--serif);
+      font-size: clamp(34px, 5vw, 62px);
+      font-weight: 300;
+      line-height: 1.02;
+      margin: 0.45rem 0 0.8rem;
+    }
+    .demo-workspace-intro p {
+      color: var(--ds-muted);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+    .demo-builder {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.82fr) minmax(0, 1.18fr);
+      gap: 1rem;
+      align-items: start;
+    }
+    .demo-picker,
+    .pipeline-preview {
+      border: 0.5px solid var(--ds-line);
+      background: #fff;
+      padding: 1rem;
+    }
+    .picker-label {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ds-gold-deep);
+      margin-bottom: 0.8rem;
+      font-weight: 700;
+    }
+    .business-list,
+    .task-list {
+      display: grid;
+      gap: 0.6rem;
+    }
+    .business-card,
+    .task-chip {
+      text-align: left;
+      border: 0.5px solid var(--ds-line);
+      background: #fff;
+      color: var(--ds-black);
+      padding: 0.9rem;
+      cursor: pointer;
+      font-family: var(--sans);
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+    .business-card:hover,
+    .task-chip:hover {
+      transform: translateY(-2px);
+      border-color: rgba(212,175,55,0.45);
+      background: #fffaf0;
+    }
+    .business-card.active,
+    .task-chip.active {
+      border-color: rgba(212,175,55,0.75);
+      background: #fff8e6;
+    }
+    .business-card strong,
+    .task-chip strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 0.25rem;
+    }
+    .business-card span,
+    .task-chip span {
+      display: block;
+      color: var(--ds-muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .task-panel {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 0.5px solid var(--ds-line);
+    }
+    .pipeline-preview {
+      min-height: 560px;
+      overflow: hidden;
+    }
+    .pipeline-topline {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .pipeline-topline h3 {
+      font-family: var(--serif);
+      font-size: clamp(26px, 3vw, 42px);
+      font-weight: 300;
+      line-height: 1.08;
+      margin: 0;
+    }
+    .pipeline-outcome {
+      max-width: 340px;
+      color: #3e3e3e;
+      font-size: 13px;
+      line-height: 1.65;
+      background: #fff9ea;
+      border-left: 2px solid var(--ds-gold);
+      padding: 0.75rem 0.85rem;
+    }
+    .flowchart {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(120px, 1fr));
+      gap: 0.7rem;
+      margin-top: 1.2rem;
+    }
+    .flow-step {
+      position: relative;
+      min-height: 150px;
+      border: 0.5px solid var(--ds-line);
+      background: #fff;
+      padding: 0.85rem;
+      animation: flowStepIn 460ms cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: calc(var(--i) * 90ms);
+    }
+    .flow-step:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -0.7rem;
+      width: 0.7rem;
+      height: 0.5px;
+      background: var(--ds-gold);
+    }
+    .flow-index {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border: 0.5px solid rgba(212,175,55,0.75);
+      color: var(--ds-gold-deep);
+      margin-bottom: 0.7rem;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .flow-step h4 {
+      margin: 0 0 0.35rem;
+      font-size: 14px;
+    }
+    .flow-step p {
+      margin: 0;
+      color: var(--ds-muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .service-strip {
+      margin-top: 1rem;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.6rem;
+    }
+    .service-pill {
+      border: 0.5px solid var(--ds-line);
+      padding: 0.75rem;
+      font-size: 12px;
+      color: #3d3d3d;
+      background: #fcfbf7;
+    }
+
+    .keywords-section {
+      padding-top: 3.1rem;
+      padding-bottom: 3.1rem;
+      border-bottom: 0.5px solid var(--ds-line);
+      background: #fff;
+    }
+    .seo-keyword-text {
+      margin-top: 1rem;
+      max-width: 980px;
+      font-size: 15px;
+      color: #494949;
+      line-height: 1.9;
+    }
+
+    .pricing {
+      padding-top: 3.1rem;
+      padding-bottom: 3.1rem;
+      border-bottom: 0.5px solid var(--ds-line);
+      background: #fcfbf7;
+    }
+    .pricing-note {
+      margin-top: 0.9rem;
+      font-size: 13px;
+      color: #4d4d4d;
+      background: #fff9ea;
+      border-left: 2px solid var(--ds-gold);
+      display: inline-block;
+      padding: 8px 12px;
+    }
+    .pricing-grid {
+      margin-top: 1.8rem;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+    .price-card {
+      border: 0.5px solid var(--ds-line);
+      background: #fff;
+      padding: 1.35rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .price-card.featured {
+      border-color: rgba(212,175,55,0.6);
+      box-shadow: 0 8px 20px rgba(212,175,55,0.14);
+    }
+    .price-tier {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--ds-gold-deep);
+      margin-bottom: 0.6rem;
+      font-weight: 600;
+    }
+    .plan-fit {
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 0.9rem;
+    }
+    .price-amount {
+      font-family: var(--serif);
+      font-size: 40px;
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+    .price-period {
+      font-size: 12px;
+      color: var(--ds-muted);
+      margin-bottom: 1.1rem;
+    }
+    .price-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1.3rem;
+      flex: 1;
+    }
+    .price-features li {
+      color: var(--ds-muted);
+      font-size: 13px;
+      line-height: 1.55;
+      padding-left: 14px;
+      position: relative;
+    }
+    .price-features li::before {
+      content: "-";
+      position: absolute;
+      left: 0;
+      color: var(--ds-gold-deep);
+    }
+    .price-btn {
+      margin-top: auto;
+      width: 100%;
+      padding: 11px 14px;
+      border: 0.5px solid var(--ds-black);
+      background: var(--ds-black);
+      color: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .price-btn:hover {
+      background: var(--ds-gold-deep);
+      border-color: var(--ds-gold-deep);
+    }
+
+    .results {
+      padding-top: 3.1rem;
+      padding-bottom: 3.1rem;
+      border-bottom: 0.5px solid var(--ds-line);
+      background: #fff;
+    }
+    .results-metrics {
+      margin-top: 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+    .result-metric {
+      border: 0.5px solid var(--ds-line);
+      padding: 1rem;
+      background: #fff;
+    }
+    .result-metric strong {
+      display: block;
+      font-family: var(--serif);
+      font-size: 34px;
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+    .result-metric span {
+      color: var(--ds-muted);
+      font-size: 13px;
+    }
+    .sales-impact {
+      margin-top: 1rem;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.8rem;
+    }
+    .sales-card {
+      background: transparent;
+      color: #242424;
+      border: 0.5px solid #d9dde7;
+      padding: 0.9rem;
+      min-height: 182px;
+    }
+    .sales-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.4rem;
+      margin-bottom: 0.35rem;
+    }
+    .sales-head h4 {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.35;
+      color: #161616;
+    }
+    .sales-growth {
+      color: #d4af37;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .sales-card p {
+      color: #5d667a;
+      font-size: 12px;
+      line-height: 1.55;
+      margin-bottom: 0.65rem;
+    }
+    .sales-chart {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+      margin-bottom: 0.5rem;
+    }
+    .chart-group {
+      background: transparent;
+      border: 0.5px solid #dbe1ee;
+      padding: 0.45rem 0.4rem 0.5rem;
+    }
+    .chart-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6d7891;
+      margin-bottom: 0.35rem;
+    }
+    .chart-bars {
+      height: 56px;
+      display: flex;
+      align-items: end;
+      gap: 4px;
+      border-bottom: 1px solid #dbe1ee;
+      padding-bottom: 2px;
+    }
+    .bar {
+      flex: 1;
+      height: 0;
+      background: linear-gradient(to top, #485068, #6a748f);
+      box-shadow: 0 0 8px rgba(95,112,145,0.3);
+      transition: height 460ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .bar.after {
+      background: linear-gradient(to top, #8a6614, #d4af37);
+      box-shadow: 0 0 8px rgba(212,175,55,0.28);
+    }
+    .chart-bars .bar:nth-child(1) { transition-delay: 70ms; }
+    .chart-bars .bar:nth-child(2) { transition-delay: 130ms; }
+    .chart-bars .bar:nth-child(3) { transition-delay: 190ms; }
+    .chart-bars .bar:nth-child(4) { transition-delay: 250ms; }
+    .chart-bars .bar:nth-child(5) { transition-delay: 310ms; }
+    .chart-bars .bar:nth-child(6) { transition-delay: 370ms; }
+    .reveal.in-view .sales-card .chart-bars .bar { height: var(--h); }
+    .sales-foot {
+      color: #5c6477;
+      font-size: 11px;
+      line-height: 1.45;
+      border-top: 0.5px solid #dbe1ee;
+      padding-top: 0.45rem;
+    }
+    .testimonial-grid {
+      margin-top: 1.4rem;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+    .testimonial {
+      border: 0.5px solid var(--ds-line);
+      padding: 1rem;
+      background: #fcfbf7;
+    }
+    .testimonial p {
+      font-size: 14px;
+      color: #494949;
+      line-height: 1.7;
+      margin-bottom: 0.75rem;
+    }
+    .testimonial .author {
+      font-size: 12px;
+      color: var(--ds-gold-deep);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .tech-logos {
+      margin-top: 1.4rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+    .logo-pill {
+      border: 0.5px solid var(--ds-line);
+      background: #fff;
+      padding: 7px 10px;
+      font-size: 12px;
+      color: #4a4a4a;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .seo-block {
+      padding-top: 3.1rem;
+      padding-bottom: 3.1rem;
+      border-bottom: 0.5px solid var(--ds-line);
+      background: #fff9ea;
+    }
+    .seo-copy {
+      max-width: 980px;
+      font-size: 15px;
+      line-height: 1.85;
+      color: #473a1f;
+      margin-top: 0.9rem;
+    }
+
+    .cta-final {
+      padding-top: 3.6rem;
+      padding-bottom: 3.6rem;
+      text-align: center;
+      border-bottom: 0.5px solid var(--ds-line);
+      background: #fff;
+    }
+    .cta-final h2 {
+      font-family: var(--serif);
+      font-size: clamp(30px, 4.8vw, 54px);
+      font-weight: 300;
+      margin-bottom: 0.8rem;
+      line-height: 1.15;
+    }
+    .cta-final p {
+      max-width: 760px;
+      margin: 0 auto 1.6rem;
+      color: var(--ds-muted);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+    .cta-row {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    footer {
+      padding-top: 1.2rem;
+      padding-bottom: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+    .footer-copy {
+      font-size: 12px;
+      color: var(--ds-muted);
+    }
+    .footer-links {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      font-size: 12px;
+      color: var(--ds-muted);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .footer-links a:hover { color: var(--ds-black); }
+
+    .cookie-banner {
+      position: fixed;
+      left: 1rem;
+      right: 1rem;
+      bottom: 1rem;
+      max-width: 980px;
+      margin: 0 auto;
+      background: rgba(10,10,10,0.96);
+      color: #fafaf8;
+      border: 0.5px solid rgba(255,255,255,0.22);
+      display: none;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      z-index: 9000;
+    }
+    .cookie-banner.show { display: flex; }
+    .cookie-copy {
+      font-size: 13px;
+      line-height: 1.6;
+      max-width: 620px;
+      color: rgba(255,255,255,0.92);
+    }
+    .cookie-actions { display: flex; gap: 0.55rem; flex-wrap: wrap; }
+    .cookie-btn {
+      border: 0.5px solid rgba(255,255,255,0.35);
+      padding: 8px 12px;
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .cookie-btn.primary {
+      background: var(--ds-gold-deep);
+      border-color: var(--ds-gold-deep);
+    }
+
+    .lead-modal,
+    .policy-modal,
+    .account-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.62);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 8500;
+    }
+    .lead-modal.show,
+    .policy-modal.show,
+    .account-modal.show { display: flex; }
+
+    .modal-card {
+      width: min(560px, 96vw);
+      background: #fff;
+      border: 0.5px solid var(--ds-line);
+      padding: 1.4rem;
+      animation: rise 280ms ease;
+    }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .modal-title {
+      font-family: var(--serif);
+      font-size: 30px;
+      font-weight: 300;
+      line-height: 1.1;
+    }
+    .modal-close {
+      border: 0.5px solid var(--ds-line);
+      background: transparent;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      color: var(--ds-muted);
+      font-size: 16px;
+    }
+    .modal-sub {
+      color: var(--ds-muted);
+      font-size: 13px;
+      line-height: 1.7;
+      margin-bottom: 0.9rem;
+    }
+    .account-details {
+      border: 0.5px solid var(--ds-line);
+      margin-bottom: 1rem;
+    }
+    .account-row {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 0.8rem;
+      padding: 0.75rem;
+      border-bottom: 0.5px solid var(--ds-line);
+      font-size: 13px;
+    }
+    .account-row:last-child {
+      border-bottom: none;
+    }
+    .account-label {
+      color: var(--ds-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 11px;
+    }
+    .account-value {
+      color: var(--ds-black);
+      overflow-wrap: anywhere;
+    }
+    .account-actions {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 0.5px solid var(--ds-line);
+      margin-bottom: 0.9rem;
+    }
+    .auth-tab {
+      border: none;
+      background: #fff;
+      color: var(--ds-muted);
+      padding: 10px;
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .auth-tab.active {
+      background: var(--ds-black);
+      color: #fff;
+    }
+    .signin-form {
+      display: none;
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+    }
+    .signin-form.active {
+      display: grid;
+    }
+    .lead-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+    .lead-form.auth-hidden {
+      display: none;
+    }
+    .lead-form .full { grid-column: 1 / -1; }
+    .lead-form input,
+    .lead-form select,
+    .lead-form textarea {
+      width: 100%;
+      border: 0.5px solid var(--ds-line);
+      background: #fff;
+      padding: 11px;
+      font-family: var(--sans);
+      font-size: 13px;
+    }
+    .lead-form textarea { min-height: 100px; resize: vertical; }
+    .lead-form button {
+      border: none;
+      background: var(--ds-black);
+      color: #fff;
+      padding: 12px;
+      cursor: pointer;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .signin-form input,
+    .signin-form button {
+      width: 100%;
+      border: 0.5px solid var(--ds-line);
+      background: #fff;
+      padding: 11px;
+      font-family: var(--sans);
+      font-size: 13px;
+    }
+    .signin-form button {
+      border: none;
+      background: var(--ds-black);
+      color: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .toast {
+      position: fixed;
+      right: 1rem;
+      bottom: 1rem;
+      background: #101010;
+      color: #fff;
+      padding: 10px 14px;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      display: none;
+      z-index: 9200;
+      max-width: min(90vw, 360px);
+    }
+    .toast.show { display: block; }
+
+    @keyframes introWordEase {
+      0% { opacity: 0; transform: translateY(10px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes introSubEase {
+      0% { opacity: 0; transform: translateY(8px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes workspaceIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes flowStepIn {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes floatStage {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+    @keyframes haloDrift {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-10px) scale(1.05); }
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 980px) {
+      nav { flex-direction: column; align-items: flex-start; }
+      nav ul { justify-content: flex-start; }
+      .hero-metric-row { grid-template-columns: 1fr 1fr; }
+      .problem-grid,
+      .feature-grid,
+      .how-grid,
+      .use-grid,
+      .pricing-grid,
+      .results-metrics,
+      .sales-impact,
+      .testimonial-grid,
+      .demo-grid,
+      .demo-builder,
+      .service-strip { grid-template-columns: 1fr; }
+      .flowchart { grid-template-columns: 1fr; }
+      .flow-step:not(:last-child)::after {
+        top: auto;
+        right: 50%;
+        bottom: -0.7rem;
+        width: 0.5px;
+        height: 0.7rem;
+      }
+      .tagline-band { flex-direction: column; align-items: flex-start; }
+      .band-label { text-align: left; }
+    }
+
+    @media (max-width: 760px) {
+      .site > nav,
+      .site > .hero,
+      .site > .tagline-band,
+      .site > .problems,
+      .site > .solutions,
+      .site > .how-it-works,
+      .site > .use-cases,
+      .site > .live-demo,
+      .site > .keywords-section,
+      .site > .pricing,
+      .site > .results,
+      .site > .seo-block,
+      .site > .cta-final,
+      .site > footer {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      .hero { padding-top: 3rem; padding-bottom: 2.6rem; }
+      .problems,
+      .solutions,
+      .how-it-works,
+      .use-cases,
+      .live-demo,
+      .keywords-section,
+      .pricing,
+      .results,
+      .seo-block,
+      .cta-final { padding-top: 2.6rem; padding-bottom: 2.6rem; }
+      h1 { font-size: clamp(34px, 11vw, 50px); }
+      .lead-form { grid-template-columns: 1fr; }
+      .demo-workspace-head { align-items: flex-start; flex-direction: column; }
+      .demo-workspace-actions { justify-content: flex-start; }
+      .pipeline-topline { align-items: flex-start; }
+      .cookie-banner.show { flex-direction: column; align-items: flex-start; }
+      .skip-intro { right: 1rem; bottom: 1rem; }
+      .aias-text { letter-spacing: 0.06em; }
+      .aias-glow { letter-spacing: 0.03em; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+      .cinematic-intro { display: none !important; }
+      .site { opacity: 1; transform: none; }
+      .problems,
+      .solutions,
+      .how-it-works,
+      .use-cases,
+      .live-demo,
+      .keywords-section,
+      .pricing,
+      .results,
+      .seo-block,
+      .cta-final,
+      footer,
+      .hero,
+      .tagline-band { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body class="intro-lock">
+  <div class="cinematic-intro" id="cinematicIntro" aria-label="AIAS cinematic intro">
+    <div class="animate__animated animate__flip" style="--animate-duration: 1.2s; animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);">
+      <div class="aias-stage">
+        <div class="aias-text" aria-label="AIAS">
+        <span class="aias-letter gold-text" style="--i: 0;">A</span>
+        <span class="aias-letter black-text" style="--i: 1;">I</span>
+        <span class="aias-letter black-text" style="--i: 2;">A</span>
+        <span class="aias-letter gold-text" style="--i: 3;">S</span>
+      </div>
+      <div class="aias-glow" aria-label="we not just build we will maintain">
+        <div class="aias-sub-line">
+          <span class="aias-sub-word gold-text" style="--i: 0;">we</span>
+          <span class="aias-sub-word gold-text" style="--i: 1;">not</span>
+          <span class="aias-sub-word gold-text" style="--i: 2;">just</span>
+          <span class="aias-sub-word gold-text" style="--i: 3;">build</span>
+        </div>
+        <div class="aias-sub-line">
+          <span class="aias-sub-word black-text" style="--i: 4;">we</span>
+          <span class="aias-sub-word black-text" style="--i: 5;">will</span>
+          <span class="aias-sub-word black-text" style="--i: 6;">maintain</span>
+        </div>
+      </div>
+    </div>
+    </div>
+    <button class="skip-intro" type="button" id="skipIntro">Skip Intro</button>
+  </div>
+
+  <div class="site" id="siteRoot">
+    <nav>
+      <div class="logo">AIAS <span>Platform</span></div>
+      <ul>
+        <li><a href="#features">Platform</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#use-cases">Use Cases</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#" id="navPrimaryCta" class="nav-cta" data-action="demo-gate" data-source="Top Nav CTA">See Demo</a></li>
+      </ul>
+    </nav>
+
+    <section class="hero reveal" id="about">
+      <div class="hero-eyebrow">AI SaaS Platform for Business Automation</div>
+      <h1>Deploy AI agents to automate your business workflows in minutes.</h1>
+      <p class="hero-sub">AIAS is an AI SaaS platform that connects your tools, deploys AI agents for business, and runs AI workflow automation from one control center so teams can move faster with less manual work.</p>
+      <p class="hero-use-case">Use case example: A support team auto-classifies incoming tickets, drafts replies, updates CRM records, and escalates priority issues in real time.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" type="button" data-action="demo-gate" data-source="Hero See Demo" data-plan="Growth">See Demo</button>
+        <button class="btn-secondary" type="button" data-action="book-call" data-source="Hero Book Call">Book Call</button>
+      </div>
+      <div class="hero-metric-row">
+        <div class="metric"><div class="metric-val">10x</div><div class="metric-label">Faster AI deployment</div></div>
+        <div class="metric"><div class="metric-val">60%</div><div class="metric-label">Lower manual workload</div></div>
+        <div class="metric"><div class="metric-val">99.95%</div><div class="metric-label">Platform uptime target</div></div>
+        <div class="metric"><div class="metric-val">72h</div><div class="metric-label">Average time to first automation</div></div>
+      </div>
+    </section>
+
+    <div class="tagline-band reveal">
+      <p>One platform to deploy AI in business, automate workflows, and scale operations without adding headcount.</p>
+      <div class="band-label">B2B AI SaaS<br>Product First Platform</div>
+    </div>
+
+    <section class="problems reveal" id="problems">
+      <div class="section-tag">Problems We Solve</div>
+      <h2 class="section-title">Why teams struggle to automate business workflows with AI</h2>
+      <p class="section-copy">Most teams buy multiple tools, but still do repetitive work manually. AIAS solves the integration, deployment, and analytics gaps that slow down business automation.</p>
+      <div class="problem-grid">
+        <div class="problem-item">
+          <div class="problem-num">01</div>
+          <div class="problem-title">Your business tools are not integrated with AI automation software</div>
+          <div class="problem-body">Data lives in separate apps, so your team cannot run AI workflow automation end-to-end across sales, support, and operations.</div>
+        </div>
+        <div class="problem-item">
+          <div class="problem-num">02</div>
+          <div class="problem-title">AI agents for business are hard to deploy and maintain</div>
+          <div class="problem-body">Generic models do not map to your process logic, approvals, and SLAs, so deployment stalls before teams see outcomes.</div>
+        </div>
+        <div class="problem-item">
+          <div class="problem-num">03</div>
+          <div class="problem-title">You cannot scale enterprise AI solutions safely</div>
+          <div class="problem-body">Without governance, audit trails, and role controls, scaling AI across teams creates risk and inconsistent output quality.</div>
+        </div>
+        <div class="problem-item">
+          <div class="problem-num">04</div>
+          <div class="problem-title">You lack real-time AI analytics on business impact</div>
+          <div class="problem-body">Teams cannot measure automation value quickly, so leaders struggle to reduce operational cost with AI and prioritize the next rollout.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="solutions reveal" id="features">
+      <div class="section-tag">Product Features</div>
+      <h2 class="section-title">Built as a scalable AI platform, not an agency service</h2>
+      <p class="section-copy">Each feature is designed to solve a clear operations problem, deliver measurable value, and help teams deploy AI in business faster.</p>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <h3 class="feature-name">AI Workflow Automation Engine</h3>
+          <p class="feature-benefit">Automate repetitive business tasks using AI agents for business and rule-based orchestration across your existing tools.</p>
+          <div class="feature-outcome">Outcome: Reduce manual operational work by up to 60%</div>
+        </article>
+        <article class="feature-card">
+          <h3 class="feature-name">AI Platform to Build and Deploy Automation</h3>
+          <p class="feature-benefit">Use templates, prompts, and integration connectors to launch AI tools for automation without custom project cycles.</p>
+          <div class="feature-outcome">Outcome: Launch production automations in days, not months</div>
+        </article>
+        <article class="feature-card">
+          <h3 class="feature-name">Enterprise AI Solutions with Governance</h3>
+          <p class="feature-benefit">Run secure multi-team workflows with approvals, role access, audit logs, and policy controls for regulated operations.</p>
+          <div class="feature-outcome">Outcome: Scale AI across departments with consistent quality</div>
+        </article>
+        <article class="feature-card">
+          <h3 class="feature-name">Real-Time AI Analytics and ROI Tracking</h3>
+          <p class="feature-benefit">Track execution volume, time saved, and business outcomes in one dashboard with real-time AI analytics.</p>
+          <div class="feature-outcome">Outcome: Prove ROI quickly and optimize automation strategy</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="how-it-works reveal" id="how-it-works">
+      <div class="section-tag">How It Works</div>
+      <h2 class="section-title">Three steps to automate business workflows</h2>
+      <p class="section-copy">AIAS simplifies enterprise deployment so teams can move from setup to outcomes quickly.</p>
+      <div class="how-grid">
+        <article class="how-card">
+          <div class="how-step">Step 1</div>
+          <h3 class="how-title">Connect your data</h3>
+          <p class="how-body">Connect CRM, ERP, support, and internal systems so your AI automation software can run with context and clean inputs.</p>
+        </article>
+        <article class="how-card">
+          <div class="how-step">Step 2</div>
+          <h3 class="how-title">Deploy AI agents</h3>
+          <p class="how-body">Choose workflow templates, set decision rules, and deploy AI agents for business by team, function, or process stage.</p>
+        </article>
+        <article class="how-card">
+          <div class="how-step">Step 3</div>
+          <h3 class="how-title">Automate workflows</h3>
+          <p class="how-body">Run automations continuously, monitor with real-time AI analytics, and improve outputs with built-in feedback loops.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="use-cases reveal" id="use-cases">
+      <div class="section-tag">Use Cases</div>
+      <h2 class="section-title">AI for startups, enterprises, and agriculture teams</h2>
+      <p class="section-copy">Every use case is structured around a business bottleneck and a measurable automation outcome.</p>
+      <div class="use-grid">
+        <article class="use-card">
+          <h3 class="use-title">AI for startups</h3>
+          <p class="use-body">Automate lead qualification, onboarding tasks, and support triage so lean teams can scale without hiring too early.</p>
+          <div class="use-result">Result: Faster go-to-market with stronger AI productivity tools</div>
+        </article>
+        <article class="use-card">
+          <h3 class="use-title">AI for enterprises</h3>
+          <p class="use-body">Standardize operations across departments with enterprise AI solutions, approvals, and compliance visibility.</p>
+          <div class="use-result">Result: Consistent execution and lower cross-team process friction</div>
+        </article>
+        <article class="use-card">
+          <h3 class="use-title">AI for agriculture</h3>
+          <p class="use-body">Automate crop planning workflows, alert routing, and field reporting with AI agents connected to operational data streams.</p>
+          <div class="use-result">Result: Better planning speed and real-time decision support</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="live-demo reveal" id="live-demo">
+      <div class="section-tag">Live Demo / Product Preview</div>
+      <h2 class="section-title">See AIAS run automation in real time</h2>
+      <p class="section-copy">Preview how the platform executes AI workflow automation from event trigger to business action and reporting.</p>
+      <div class="demo-shell">
+        <div class="demo-toolbar">
+          <div class="demo-title">AIAS Workflow Preview</div>
+          <div class="demo-status">Status: Live simulation mode</div>
+        </div>
+        <div class="demo-grid">
+          <div class="demo-panel">
+            <h4>Automation Pipeline</h4>
+            <p>Incoming request -> AI intent detection -> policy check -> business action -> analytics update.</p>
+            <ul class="demo-list">
+              <li>Lead form captured and enriched with company data</li>
+              <li>AI agent qualifies lead and assigns priority</li>
+              <li>Task synced to CRM and sales queue automatically</li>
+            </ul>
+          </div>
+          <div class="demo-panel">
+            <h4>Business Impact Snapshot</h4>
+            <p>Estimated impact with active AI tools for automation:</p>
+            <ul class="demo-list">
+              <li>42% faster response cycle</li>
+              <li>31% lower manual ticket handling</li>
+              <li>18% higher qualified pipeline throughput</li>
+            </ul>
+          </div>
+        </div>
+        <div class="demo-actions">
+          <button class="btn-primary" type="button" data-action="demo-gate" data-source="Live Demo Launch">See Demo</button>
+          <button class="btn-secondary" type="button" data-action="book-call" data-source="Live Demo Book Call">Book Call</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="keywords-section reveal" id="seo-keywords">
+      <div class="section-tag">SEO Content Block</div>
+      <h2 class="section-title">Why teams choose AIAS for B2B automation</h2>
+      <p class="seo-keyword-text">AIAS is an AI SaaS platform and AI automation software built for companies that need reliable execution, not experiments. Our B2B AI SaaS product helps teams deploy AI in business with AI agents for business, AI workflow automation, and enterprise AI solutions from one scalable AI platform. Instead of disconnected scripts, you get structured AI tools for automation that reduce manual effort and improve consistency. Teams use AIAS to reduce operational cost with AI, automate business workflows, and track performance with real-time AI analytics. The platform is designed as AI for startups and enterprises, with practical AI productivity tools and governance controls that support day-to-day execution at scale.</p>
+    </section>
+
+    <section class="pricing reveal" id="pricing">
+      <div class="section-tag">Pricing</div>
+      <h2 class="section-title">Simple plans for every growth stage</h2>
+      <p class="section-copy">Choose a plan based on your workflow volume and team size, then scale usage without changing platforms.</p>
+      <div class="pricing-note">No hidden fees. Cancel anytime.</div>
+      <div class="pricing-grid">
+        <article class="price-card">
+          <div class="price-tier">Starter</div>
+          <div class="plan-fit">Best for startups and early automation teams</div>
+          <div class="price-amount">INR 49K</div>
+          <div class="price-period">per month</div>
+          <ul class="price-features">
+            <li>Up to 2 AI workflow automations</li>
+            <li>Core integrations and deployment</li>
+            <li>Automation health dashboard</li>
+            <li>Email support (48h SLA)</li>
+          </ul>
+          <button class="price-btn" type="button" data-action="book-call" data-source="Pricing Starter Book Call">Book Call</button>
+        </article>
+        <article class="price-card featured">
+          <div class="price-tier">Growth</div>
+          <div class="plan-fit">Best for growing teams and multi-workflow operations</div>
+          <div class="price-amount">INR 120K</div>
+          <div class="price-period">per month</div>
+          <ul class="price-features">
+            <li>Up to 8 AI agents for business</li>
+            <li>Advanced workflow orchestration</li>
+            <li>Real-time AI analytics dashboards</li>
+            <li>Priority support (12h SLA)</li>
+          </ul>
+          <button class="price-btn" type="button" data-action="book-call" data-source="Pricing Growth Book Call">Book Call</button>
+        </article>
+        <article class="price-card">
+          <div class="price-tier">Enterprise</div>
+          <div class="plan-fit">Best for scaling businesses with governance requirements</div>
+          <div class="price-amount">Custom</div>
+          <div class="price-period">annual plan</div>
+          <ul class="price-features">
+            <li>Unlimited enterprise AI solutions</li>
+            <li>Multi-team role and policy controls</li>
+            <li>Private deployment options</li>
+            <li>Dedicated success and architecture support</li>
+          </ul>
+          <button class="price-btn" type="button" data-action="book-call" data-source="Pricing Enterprise Book Call">Book Call</button>
+        </article>
+      </div>
+    </section>
+
+    <section class="results reveal" id="results">
+      <div class="section-tag">Real Results and Trust</div>
+      <h2 class="section-title">Proof that automation delivers measurable outcomes</h2>
+      <p class="section-copy">These are representative platform metrics and customer outcomes from active automation environments.</p>
+      <div class="results-metrics">
+        <div class="result-metric"><strong>2.4M+</strong><span>Automation tasks executed</span></div>
+        <div class="result-metric"><strong>350+</strong><span>Active teams on platform</span></div>
+        <div class="result-metric"><strong>99.95%</strong><span>Observed infrastructure uptime</span></div>
+      </div>
+      <div class="sales-impact">
+        <article class="sales-card">
+          <div class="sales-head">
+            <h4>Monthly Sales Pipeline</h4>
+            <span class="sales-growth">+138%</span>
+          </div>
+          <p>Before AIAS: slow lead movement. After AIAS: faster qualification and follow-up velocity.</p>
+          <div class="sales-chart">
+            <div class="chart-group">
+              <div class="chart-label">Before AIAS</div>
+              <div class="chart-bars">
+                <span class="bar" style="--h:22%;"></span>
+                <span class="bar" style="--h:30%;"></span>
+                <span class="bar" style="--h:35%;"></span>
+                <span class="bar" style="--h:40%;"></span>
+                <span class="bar" style="--h:44%;"></span>
+                <span class="bar" style="--h:48%;"></span>
+              </div>
+            </div>
+            <div class="chart-group">
+              <div class="chart-label">After AIAS</div>
+              <div class="chart-bars">
+                <span class="bar after" style="--h:45%;"></span>
+                <span class="bar after" style="--h:58%;"></span>
+                <span class="bar after" style="--h:67%;"></span>
+                <span class="bar after" style="--h:74%;"></span>
+                <span class="bar after" style="--h:82%;"></span>
+                <span class="bar after" style="--h:90%;"></span>
+              </div>
+            </div>
+          </div>
+          <div class="sales-foot">Conversion window reduced from 21 days to 9 days.</div>
+        </article>
+        <article class="sales-card">
+          <div class="sales-head">
+            <h4>Revenue Per Rep</h4>
+            <span class="sales-growth">+92%</span>
+          </div>
+          <p>Before AIAS: manual updates and drop-offs. After AIAS: AI-driven follow-ups increase rep efficiency.</p>
+          <div class="sales-chart">
+            <div class="chart-group">
+              <div class="chart-label">Before AIAS</div>
+              <div class="chart-bars">
+                <span class="bar" style="--h:28%;"></span>
+                <span class="bar" style="--h:31%;"></span>
+                <span class="bar" style="--h:34%;"></span>
+                <span class="bar" style="--h:38%;"></span>
+                <span class="bar" style="--h:42%;"></span>
+                <span class="bar" style="--h:46%;"></span>
+              </div>
+            </div>
+            <div class="chart-group">
+              <div class="chart-label">After AIAS</div>
+              <div class="chart-bars">
+                <span class="bar after" style="--h:43%;"></span>
+                <span class="bar after" style="--h:52%;"></span>
+                <span class="bar after" style="--h:61%;"></span>
+                <span class="bar after" style="--h:68%;"></span>
+                <span class="bar after" style="--h:74%;"></span>
+                <span class="bar after" style="--h:81%;"></span>
+              </div>
+            </div>
+          </div>
+          <div class="sales-foot">Average revenue per rep increased from INR 1.9L to INR 3.6L.</div>
+        </article>
+        <article class="sales-card">
+          <div class="sales-head">
+            <h4>Repeat Purchase Sales</h4>
+            <span class="sales-growth">+76%</span>
+          </div>
+          <p>Before AIAS: weak retention campaigns. After AIAS: automated renewal nudges and upsell intelligence.</p>
+          <div class="sales-chart">
+            <div class="chart-group">
+              <div class="chart-label">Before AIAS</div>
+              <div class="chart-bars">
+                <span class="bar" style="--h:18%;"></span>
+                <span class="bar" style="--h:22%;"></span>
+                <span class="bar" style="--h:27%;"></span>
+                <span class="bar" style="--h:30%;"></span>
+                <span class="bar" style="--h:33%;"></span>
+                <span class="bar" style="--h:36%;"></span>
+              </div>
+            </div>
+            <div class="chart-group">
+              <div class="chart-label">After AIAS</div>
+              <div class="chart-bars">
+                <span class="bar after" style="--h:35%;"></span>
+                <span class="bar after" style="--h:42%;"></span>
+                <span class="bar after" style="--h:51%;"></span>
+                <span class="bar after" style="--h:58%;"></span>
+                <span class="bar after" style="--h:63%;"></span>
+                <span class="bar after" style="--h:69%;"></span>
+              </div>
+            </div>
+          </div>
+          <div class="sales-foot">Repeat sales contribution moved from 18% to 32% of monthly revenue.</div>
+        </article>
+      </div>
+      <div class="testimonial-grid">
+        <article class="testimonial">
+          <p>"AIAS helped us automate business workflows across support and onboarding in under two weeks."</p>
+          <div class="author">COO, B2B SaaS Startup</div>
+        </article>
+        <article class="testimonial">
+          <p>"We replaced manual routing with AI agents for business and cut average response time by almost half."</p>
+          <div class="author">Head of Operations, Enterprise Team</div>
+        </article>
+        <article class="testimonial">
+          <p>"The real-time AI analytics view made it easy to prove ROI and prioritize the next automation rollout."</p>
+          <div class="author">Director, Digital Programs</div>
+        </article>
+      </div>
+      <div class="tech-logos">
+        <span class="logo-pill">OpenAI</span>
+        <span class="logo-pill">AWS</span>
+        <span class="logo-pill">Google Cloud</span>
+        <span class="logo-pill">PostgreSQL</span>
+        <span class="logo-pill">Docker</span>
+        <span class="logo-pill">Kubernetes</span>
+        <span class="logo-pill">Stripe</span>
+      </div>
+    </section>
+
+    <section class="seo-block reveal" id="what-is-ai-saas">
+      <div class="section-tag">What Is AI SaaS Platform?</div>
+      <h2 class="section-title">What is an AI SaaS platform and why it matters</h2>
+      <p class="seo-copy">An AI SaaS platform is cloud software that lets businesses deploy artificial intelligence features without building everything from scratch. Instead of creating separate models, scripts, and infrastructure for every team, companies use one platform to connect data sources, run AI agents, and automate workflow decisions. AIAS is built for organizations that want fast deployment and reliable operations, from startup teams to large enterprises. It helps teams launch automations, monitor performance, and improve output quality with clear governance and analytics. This product-first approach reduces technical overhead, improves execution speed, and gives leaders a practical way to scale AI adoption across departments while keeping business processes controlled and measurable.</p>
+    </section>
+
+    <section class="cta-final reveal" id="contact">
+      <h2>Start Automating Your Business with AI Today</h2>
+      <p>Launch faster with a scalable AI platform built for measurable execution. Try the product preview or book a call with our team to plan your rollout.</p>
+      <div class="cta-row">
+        <button class="btn-primary" type="button" data-action="demo-gate" data-source="Final CTA See Demo" data-plan="Consultation">See Demo</button>
+        <button class="btn-secondary" type="button" data-action="book-call" data-source="Final CTA Book Call">Book Call</button>
+      </div>
+    </section>
+
+    <footer class="reveal">
+      <div class="footer-copy">Copyright 2026 AIAS. All rights reserved.</div>
+      <div class="footer-links">
+        <a data-action="policy" data-policy="privacy">Privacy</a>
+        <a data-action="policy" data-policy="terms">Terms</a>
+        <a data-action="lead-modal" data-source="Footer Contact" data-plan="General Inquiry">Contact</a>
+        <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" data-track="LinkedIn Click">LinkedIn</a>
+      </div>
+    </footer>
+  </div>
+
+  <section class="demo-workspace" id="demoWorkspace" aria-hidden="true">
+    <div class="demo-workspace-head">
+      <div class="demo-workspace-brand">AIAS <span>Demo</span></div>
+      <div class="demo-workspace-actions">
+        <button class="btn-secondary" type="button" data-action="back-home">Back to Website</button>
+        <button class="btn-primary" type="button" data-action="book-call" data-source="Demo Workspace Book Call">Book Call</button>
+      </div>
+    </div>
+    <div class="demo-workspace-body">
+      <div class="demo-workspace-intro">
+        <div class="section-tag">AI Pipeline Builder</div>
+        <h2>Choose your business and see what AIAS can automate.</h2>
+        <p>Pick a booming business type, choose a common task, and AIAS will map the pipeline from incoming work to AI action, system update, and reporting.</p>
+      </div>
+      <div class="demo-builder">
+        <aside class="demo-picker">
+          <div class="picker-label">Booming business types</div>
+          <div class="business-list" id="businessList"></div>
+          <div class="task-panel">
+            <div class="picker-label">Business tasks</div>
+            <div class="task-list" id="taskList"></div>
+          </div>
+        </aside>
+        <section class="pipeline-preview" id="pipelinePreview" aria-live="polite">
+          <div class="pipeline-topline">
+            <div>
+              <div class="section-tag" id="pipelineIndustry">Retail & E-commerce</div>
+              <h3 id="pipelineTitle">Customer support and order updates</h3>
+            </div>
+            <div class="pipeline-outcome" id="pipelineOutcome">AIAS handles customer messages, checks order context, drafts the answer, updates the helpdesk, and sends performance data to the dashboard.</div>
+          </div>
+          <div class="flowchart" id="flowchart"></div>
+          <div class="service-strip" id="serviceStrip"></div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <div class="cookie-banner" id="cookieBanner" role="dialog" aria-live="polite">
+    <p class="cookie-copy">AIAS uses cookies to personalize your experience, store your session preference, and measure product usage. Accept analytics to enable interaction tracking.</p>
+    <div class="cookie-actions">
+      <button class="cookie-btn" type="button" id="declineCookies">Decline</button>
+      <button class="cookie-btn" type="button" id="essentialCookies">Essential Only</button>
+      <button class="cookie-btn primary" type="button" id="acceptCookies">Accept All</button>
+    </div>
+  </div>
+
+  <div class="lead-modal" id="leadModal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 class="modal-title" id="authModalTitle">Create Your AIAS Access</h3>
+        <button class="modal-close" type="button" data-close="lead">X</button>
+      </div>
+      <p class="modal-sub" id="authModalSub">Submit your details once and we will remember your access on this device, so you are not asked to sign in again.</p>
+      <div class="auth-tabs" role="tablist" aria-label="AIAS access">
+        <button class="auth-tab active" type="button" data-auth-mode="signup">Sign Up</button>
+        <button class="auth-tab" type="button" data-auth-mode="signin">Sign In</button>
+      </div>
+      <form class="lead-form" id="leadForm">
+        <input type="text" name="name" placeholder="Full name" required />
+        <input type="email" name="email" placeholder="Work email" required />
+        <input type="text" name="company" placeholder="Company" required />
+        <select name="plan" id="selectedPlan" required>
+          <option value="">Select interest</option>
+          <option value="Starter">Starter</option>
+          <option value="Growth">Growth</option>
+          <option value="Enterprise">Enterprise</option>
+          <option value="Consultation">Consultation</option>
+          <option value="General Inquiry">General Inquiry</option>
+        </select>
+        <textarea class="full" name="message" placeholder="What workflow do you want to automate?"></textarea>
+        <button class="full" type="submit">Save and Continue</button>
+      </form>
+      <form class="signin-form" id="signinForm">
+        <input type="email" name="email" placeholder="Work email used during signup" required />
+        <button type="submit">Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="policy-modal" id="policyModal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 class="modal-title" id="policyTitle">Policy</h3>
+        <button class="modal-close" type="button" data-close="policy">X</button>
+      </div>
+      <p class="modal-sub" id="policyBody"></p>
+    </div>
+  </div>
+
+  <div class="account-modal" id="accountModal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 class="modal-title">Your AIAS Account</h3>
+        <button class="modal-close" type="button" data-close="account">X</button>
+      </div>
+      <p class="modal-sub">This is the access saved on this device. Do you want to continue or logout?</p>
+      <div class="account-details" id="accountDetails"></div>
+      <div class="account-actions">
+        <button class="btn-secondary" type="button" data-close="account">Stay Signed In</button>
+        <button class="btn-primary" type="button" id="accountLogoutBtn">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (function () {
+      const intro = document.getElementById("cinematicIntro");
+      const skipIntroBtn = document.getElementById("skipIntro");
+      const siteRoot = document.getElementById("siteRoot");
+      const cookieBanner = document.getElementById("cookieBanner");
+      const leadModal = document.getElementById("leadModal");
+      const policyModal = document.getElementById("policyModal");
+      const accountModal = document.getElementById("accountModal");
+      const accountDetails = document.getElementById("accountDetails");
+      const accountLogoutBtn = document.getElementById("accountLogoutBtn");
+      const policyTitle = document.getElementById("policyTitle");
+      const policyBody = document.getElementById("policyBody");
+      const planInput = document.getElementById("selectedPlan");
+      const leadForm = document.getElementById("leadForm");
+      const signinForm = document.getElementById("signinForm");
+      const authModalTitle = document.getElementById("authModalTitle");
+      const authModalSub = document.getElementById("authModalSub");
+      const toast = document.getElementById("toast");
+      const navPrimaryCta = document.getElementById("navPrimaryCta");
+      const demoWorkspace = document.getElementById("demoWorkspace");
+      const businessList = document.getElementById("businessList");
+      const taskList = document.getElementById("taskList");
+      const pipelineIndustry = document.getElementById("pipelineIndustry");
+      const pipelineTitle = document.getElementById("pipelineTitle");
+      const pipelineOutcome = document.getElementById("pipelineOutcome");
+      const flowchart = document.getElementById("flowchart");
+      const serviceStrip = document.getElementById("serviceStrip");
+
+      const BOOK_CALL_URL = "https://cal.com";
+
+      const policyText = {
+        privacy: "AIAS stores form details in local browser storage after submission and keeps cookie preference settings to avoid repeated sign-in prompts on the same device.",
+        terms: "This page is a product preview experience. Demo submissions are stored locally in your browser. You can integrate these events with your backend CRM or automation API."
+      };
+
+      const consentCookie = "aias_cookie_consent";
+      const interactionStorageKey = "aias_interactions";
+      const leadStorageKey = "aias_leads";
+      const profileStorageKey = "aias_visitor_profile";
+      const ipHintKey = "aias_ip_hint";
+      let pendingDemoAfterAuth = false;
+      let activeBusinessIndex = 0;
+      let activeTaskIndex = 0;
+
+      const demoBusinesses = [
+        {
+          industry: "Retail & E-commerce",
+          signal: "Fast-moving stores need instant support, order updates, and campaign execution.",
+          tasks: [
+            {
+              name: "Customer support and order updates",
+              outcome: "AIAS handles customer messages, checks order context, drafts the answer, updates the helpdesk, and sends performance data to the dashboard.",
+              services: ["AI support agent", "Order data connector", "Helpdesk automation", "Response analytics"],
+              steps: [
+                ["Trigger", "Customer asks about an order, refund, or delivery delay."],
+                ["Understand", "AIAS reads intent, urgency, order ID, and customer history."],
+                ["Decide", "Policy rules decide whether to answer, escalate, or request approval."],
+                ["Act", "The agent replies, updates the ticket, and notifies the right team."],
+                ["Report", "Dashboard tracks response time, repeat issues, and saved handling work."]
+              ]
+            },
+            {
+              name: "Marketing content and offer follow-up",
+              outcome: "AIAS turns campaign ideas into segmented follow-ups, product copy, and next-step tasks for the sales or support team.",
+              services: ["Content agent", "CRM segmentation", "Approval workflow", "Campaign reporting"],
+              steps: [
+                ["Trigger", "New campaign, abandoned cart list, or product launch enters the system."],
+                ["Segment", "AIAS groups customers by intent, order history, and likely offer fit."],
+                ["Generate", "AI creates approved email, WhatsApp, and ad copy variants."],
+                ["Route", "Tasks and messages move to CRM, marketing, or support queues."],
+                ["Measure", "Analytics shows replies, conversions, and copy performance."]
+              ]
+            }
+          ]
+        },
+        {
+          industry: "Clinics & Healthcare Services",
+          signal: "High-volume clinics need scheduling, intake, reminders, and document handling.",
+          tasks: [
+            {
+              name: "Patient intake and appointment routing",
+              outcome: "AIAS collects symptoms, checks appointment fit, routes priority cases, and keeps staff focused on care work.",
+              services: ["Intake agent", "Calendar connector", "Priority routing", "Audit trail"],
+              steps: [
+                ["Trigger", "Patient submits a form, chat message, or missed-call request."],
+                ["Collect", "AIAS asks structured intake questions and checks missing details."],
+                ["Classify", "The request is tagged by urgency, service type, and doctor availability."],
+                ["Schedule", "Calendar slots, reminders, and staff tasks are created automatically."],
+                ["Monitor", "Operations sees no-shows, wait time, and intake completion."]
+              ]
+            },
+            {
+              name: "Follow-up reminders and reports",
+              outcome: "AIAS automates post-visit reminders, document summaries, and internal follow-up queues.",
+              services: ["Reminder agent", "Document summarizer", "Task automation", "Compliance logs"],
+              steps: [
+                ["Trigger", "Visit note, lab status, or follow-up date is added."],
+                ["Summarize", "AIAS extracts next steps and required patient communication."],
+                ["Check", "Policy rules confirm what can be sent automatically."],
+                ["Send", "Patient reminders and staff tasks are created on schedule."],
+                ["Track", "Completion, delays, and unresolved cases are visible."]
+              ]
+            }
+          ]
+        },
+        {
+          industry: "Real Estate & Property Teams",
+          signal: "Lead speed, document routing, and site-visit coordination decide revenue.",
+          tasks: [
+            {
+              name: "Lead qualification and site visit booking",
+              outcome: "AIAS qualifies property leads, scores urgency, books visits, and keeps brokers updated without spreadsheet work.",
+              services: ["Lead qualifier", "CRM connector", "Calendar routing", "Broker alerts"],
+              steps: [
+                ["Trigger", "Lead arrives from website, ads, WhatsApp, or marketplace."],
+                ["Qualify", "AIAS captures budget, location, timeline, and property type."],
+                ["Score", "Rules rank buyer urgency and match the right project or agent."],
+                ["Book", "Site visit slots and broker tasks are created automatically."],
+                ["Report", "Pipeline shows hot leads, visit rate, and stalled stages."]
+              ]
+            },
+            {
+              name: "Document collection and deal follow-up",
+              outcome: "AIAS tracks missing documents, nudges clients, and updates the team before deals slow down.",
+              services: ["Document agent", "Reminder workflow", "CRM updates", "Deal analytics"],
+              steps: [
+                ["Trigger", "Deal moves to booking, verification, or agreement stage."],
+                ["Inspect", "AIAS checks what documents are missing or outdated."],
+                ["Request", "Client reminders are generated with clear next steps."],
+                ["Update", "CRM stage, owner, and pending tasks are refreshed."],
+                ["Escalate", "Managers see delays before the deal goes cold."]
+              ]
+            }
+          ]
+        },
+        {
+          industry: "Education, Coaching & Training",
+          signal: "Creators and institutes need enrollment, student support, and content operations.",
+          tasks: [
+            {
+              name: "Enrollment qualification and onboarding",
+              outcome: "AIAS answers student questions, qualifies fit, collects details, and moves qualified learners into onboarding.",
+              services: ["Enrollment agent", "FAQ automation", "Payment follow-up", "Student CRM"],
+              steps: [
+                ["Trigger", "Student asks about a course, batch, fee, or outcome."],
+                ["Answer", "AIAS responds using approved program and pricing knowledge."],
+                ["Qualify", "Intent, timeline, and course fit are captured."],
+                ["Onboard", "Payment follow-up, batch assignment, and welcome tasks are created."],
+                ["Track", "Team sees conversion, drop-offs, and common questions."]
+              ]
+            },
+            {
+              name: "Student support and progress nudges",
+              outcome: "AIAS detects stuck learners, sends reminders, and routes serious issues to mentors.",
+              services: ["Support agent", "LMS connector", "Progress monitor", "Mentor routing"],
+              steps: [
+                ["Trigger", "Low attendance, missed assignment, or student question appears."],
+                ["Analyze", "AIAS checks learner history and likely blocker."],
+                ["Respond", "Helpful next steps or reminders are sent automatically."],
+                ["Escalate", "Mentors get context-rich tasks for high-risk students."],
+                ["Improve", "Reports show which modules create the most friction."]
+              ]
+            }
+          ]
+        },
+        {
+          industry: "Local Services & Logistics",
+          signal: "Field teams lose time on scheduling, dispatch, updates, and exception handling.",
+          tasks: [
+            {
+              name: "Dispatch and job routing",
+              outcome: "AIAS takes incoming jobs, checks location and priority, assigns the right operator, and updates the customer.",
+              services: ["Dispatch agent", "Location rules", "SMS/WhatsApp updates", "Ops dashboard"],
+              steps: [
+                ["Trigger", "New job request, delivery issue, or service ticket arrives."],
+                ["Classify", "AIAS reads location, urgency, service type, and customer notes."],
+                ["Assign", "Rules pick the right driver, technician, or field team."],
+                ["Notify", "Customer and operator receive next-step updates."],
+                ["Watch", "Dashboard highlights delays, retries, and completed jobs."]
+              ]
+            },
+            {
+              name: "Proof collection and exception handling",
+              outcome: "AIAS follows up on failed deliveries, missing proof, and unresolved field reports.",
+              services: ["Exception agent", "Proof checklist", "Escalation logic", "Completion analytics"],
+              steps: [
+                ["Trigger", "Job fails, proof is missing, or customer reports a problem."],
+                ["Review", "AIAS checks job notes, image proof, and expected process."],
+                ["Resolve", "The agent requests missing data or suggests the next action."],
+                ["Escalate", "High-risk cases go to supervisors with context."],
+                ["Learn", "Analytics reveals repeat failure patterns by team or route."]
+              ]
+            }
+          ]
+        },
+        {
+          industry: "SaaS & B2B Service Teams",
+          signal: "Growing teams need support triage, renewals, onboarding, and handoff quality.",
+          tasks: [
+            {
+              name: "Ticket triage and escalation",
+              outcome: "AIAS classifies incoming tickets, checks account context, routes issues, and reduces manual handoffs.",
+              services: ["Triage agent", "Account context", "SLA routing", "Support analytics"],
+              steps: [
+                ["Trigger", "Customer ticket, email, or chat message enters support."],
+                ["Classify", "AIAS identifies issue type, product area, sentiment, and SLA."],
+                ["Route", "The request is assigned to the right team with context."],
+                ["Assist", "AI drafts a response or creates an internal task."],
+                ["Measure", "Dashboard tracks response speed and escalation quality."]
+              ]
+            },
+            {
+              name: "Renewal and customer success follow-up",
+              outcome: "AIAS finds renewal risk, creates CSM tasks, and sends approved follow-ups before accounts go silent.",
+              services: ["Renewal agent", "CRM health score", "CSM workflow", "Revenue reporting"],
+              steps: [
+                ["Trigger", "Renewal date, usage drop, or customer risk signal appears."],
+                ["Analyze", "AIAS checks usage, tickets, payments, and contact history."],
+                ["Plan", "Recommended next action and message are generated."],
+                ["Execute", "CSM tasks, customer emails, and CRM updates are created."],
+                ["Review", "Leaders see renewal risk and follow-up completion."]
+              ]
+            }
+          ]
+        }
+      ];
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2500);
+      }
+
+      function setCookie(name, value, days) {
+        const maxAge = days * 24 * 60 * 60;
+        document.cookie = name + "=" + encodeURIComponent(value) + "; path=/; max-age=" + maxAge + "; SameSite=Lax";
+      }
+
+      function getCookie(name) {
+        const pairs = document.cookie.split(";").map(v => v.trim());
+        for (const pair of pairs) {
+          if (pair.startsWith(name + "=")) {
+            return decodeURIComponent(pair.split("=").slice(1).join("="));
+          }
+        }
+        return "";
+      }
+
+      function getConsent() {
+        return getCookie(consentCookie) || localStorage.getItem(consentCookie) || "";
+      }
+
+      function setConsent(value) {
+        setCookie(consentCookie, value, 180);
+        localStorage.setItem(consentCookie, value);
+        cookieBanner.classList.remove("show");
+        if (value === "accepted") resolveIpHint();
+        showToast("Cookie preference saved: " + value);
+      }
+
+      function getStoredProfile() {
+        try {
+          return JSON.parse(localStorage.getItem(profileStorageKey) || "null");
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function setStoredProfile(profile) {
+        localStorage.setItem(profileStorageKey, JSON.stringify(profile));
+        setCookie("aias_known_user", "1", 365);
+      }
+
+      function clearStoredProfile() {
+        localStorage.removeItem(profileStorageKey);
+        setCookie("aias_known_user", "", 0);
+      }
+
+      function getFirstName(profile) {
+        if (!profile || !profile.name) return "there";
+        return String(profile.name).trim().split(" ")[0];
+      }
+
+      function escapeHtml(value) {
+        return String(value || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function markReturningVisitorUI() {
+        const profile = getStoredProfile();
+        if (!profile) {
+          if (navPrimaryCta) {
+            navPrimaryCta.textContent = "See Demo";
+            navPrimaryCta.setAttribute("data-action", "demo-gate");
+            navPrimaryCta.setAttribute("data-source", "Top Nav CTA");
+            navPrimaryCta.setAttribute("href", "#");
+          }
+          return;
+        }
+        const firstName = getFirstName(profile);
+        if (navPrimaryCta) {
+          navPrimaryCta.textContent = "Welcome " + firstName;
+          navPrimaryCta.setAttribute("data-action", "account");
+          navPrimaryCta.setAttribute("data-source", "Returning Nav Account");
+          navPrimaryCta.setAttribute("href", "#");
+        }
+      }
+
+      function logoutVisitor(source) {
+        const profile = getStoredProfile();
+        clearStoredProfile();
+        markReturningVisitorUI();
+        closeAccountModal();
+        saveEvent("logout", source || "unknown", { email: profile && profile.email ? profile.email : "" });
+        showToast("You have been logged out.");
+      }
+
+      function openAccountModal(source) {
+        const profile = getStoredProfile();
+        if (!profile) {
+          markReturningVisitorUI();
+          openLeadModal(source || "account", "Consultation", "signin");
+          return;
+        }
+
+        const accountRows = [
+          ["Name", profile.name],
+          ["Email", profile.email],
+          ["Company", profile.company]
+        ];
+        if (profile.plan) accountRows.push(["Plan", profile.plan]);
+        if (profile.savedAt) accountRows.push(["Saved", new Date(profile.savedAt).toLocaleString()]);
+
+        accountDetails.innerHTML = accountRows.filter(([, value]) => value).map(([label, value]) => `
+          <div class="account-row">
+            <div class="account-label">${escapeHtml(label)}</div>
+            <div class="account-value">${escapeHtml(value)}</div>
+          </div>
+        `).join("");
+
+        accountModal.classList.add("show");
+        accountModal.setAttribute("aria-hidden", "false");
+        saveEvent("open_account", source || "unknown", { email: profile.email || "" });
+      }
+
+      function closeAccountModal() {
+        accountModal.classList.remove("show");
+        accountModal.setAttribute("aria-hidden", "true");
+      }
+
+      function setAuthMode(mode) {
+        const isSignin = mode === "signin";
+        document.querySelectorAll("[data-auth-mode]").forEach(tab => {
+          tab.classList.toggle("active", tab.getAttribute("data-auth-mode") === mode);
+        });
+        leadForm.classList.toggle("auth-hidden", isSignin);
+        signinForm.classList.toggle("active", isSignin);
+        authModalTitle.textContent = isSignin ? "Sign In to AIAS" : "Create Your AIAS Access";
+        authModalSub.textContent = isSignin
+          ? "Use the work email you used earlier. Demo access stays on this device."
+          : "Create access once, then choose your business type and see the AI automation pipeline.";
+      }
+
+      function findLeadByEmail(email) {
+        const normalized = String(email || "").trim().toLowerCase();
+        const leads = JSON.parse(localStorage.getItem(leadStorageKey) || "[]");
+        return leads.slice().reverse().find(lead => String(lead.email || "").trim().toLowerCase() === normalized) || null;
+      }
+
+      function renderBusinessList() {
+        businessList.innerHTML = demoBusinesses.map((business, index) => `
+          <button class="business-card${index === activeBusinessIndex ? " active" : ""}" type="button" data-business-index="${index}">
+            <strong>${business.industry}</strong>
+            <span>${business.signal}</span>
+          </button>
+        `).join("");
+      }
+
+      function renderTaskList() {
+        const business = demoBusinesses[activeBusinessIndex];
+        taskList.innerHTML = business.tasks.map((task, index) => `
+          <button class="task-chip${index === activeTaskIndex ? " active" : ""}" type="button" data-task-index="${index}">
+            <strong>${task.name}</strong>
+            <span>${task.outcome}</span>
+          </button>
+        `).join("");
+      }
+
+      function renderPipeline() {
+        const business = demoBusinesses[activeBusinessIndex];
+        const task = business.tasks[activeTaskIndex];
+        pipelineIndustry.textContent = business.industry;
+        pipelineTitle.textContent = task.name;
+        pipelineOutcome.textContent = task.outcome;
+        flowchart.innerHTML = task.steps.map((step, index) => `
+          <article class="flow-step" style="--i:${index};">
+            <div class="flow-index">${index + 1}</div>
+            <h4>${step[0]}</h4>
+            <p>${step[1]}</p>
+          </article>
+        `).join("");
+        serviceStrip.innerHTML = task.services.map(service => `<div class="service-pill">${service}</div>`).join("");
+      }
+
+      function renderDemoWorkspace() {
+        renderBusinessList();
+        renderTaskList();
+        renderPipeline();
+      }
+
+      function openDemoWorkspace(source) {
+        if (!getStoredProfile()) {
+          pendingDemoAfterAuth = true;
+          openLeadModal(source || "demo_gate", "Consultation", "signin");
+          showToast("Please sign in or create access to view the demo.");
+          return;
+        }
+        pendingDemoAfterAuth = false;
+        renderDemoWorkspace();
+        demoWorkspace.classList.add("show");
+        demoWorkspace.setAttribute("aria-hidden", "false");
+        demoWorkspace.scrollIntoView({ behavior: "smooth", block: "start" });
+        saveEvent("open_demo_workspace", source || "unknown", { industry: demoBusinesses[activeBusinessIndex].industry });
+      }
+
+      function closeDemoWorkspace() {
+        demoWorkspace.classList.remove("show");
+        demoWorkspace.setAttribute("aria-hidden", "true");
+        const home = document.querySelector("#about");
+        if (home) home.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      function saveEvent(type, source, payload) {
+        if (getConsent() !== "accepted") return;
+        const events = JSON.parse(localStorage.getItem(interactionStorageKey) || "[]");
+        events.push({
+          type: type,
+          source: source,
+          payload: payload || {},
+          timestamp: new Date().toISOString()
+        });
+        localStorage.setItem(interactionStorageKey, JSON.stringify(events.slice(-150)));
+        setCookie("aias_last_interaction", type + ":" + source, 30);
+      }
+
+      function launchDemo(source) {
+        saveEvent("launch_demo", source || "unknown", {});
+        openDemoWorkspace(source || "launch_demo");
+      }
+
+      function openBookCall(source) {
+        saveEvent("book_call_click", source || "unknown", {});
+        window.open(BOOK_CALL_URL, "_blank", "noopener,noreferrer");
+      }
+
+      function handleKnownVisitor(source, plan) {
+        const profile = getStoredProfile();
+        if (!profile) return false;
+        const firstName = getFirstName(profile);
+        saveEvent("returning_user", source || "unknown", { plan: plan || "", ip_hint: profile.ipHint || "" });
+        showToast("Welcome back " + firstName + ". Your details are already saved.");
+        launchDemo(source || "returning_user");
+        return true;
+      }
+
+      function openLeadModal(source, plan, mode) {
+        if (handleKnownVisitor(source, plan)) return;
+        if (plan) planInput.value = plan;
+        setAuthMode(mode || "signup");
+        leadModal.classList.add("show");
+        leadModal.setAttribute("aria-hidden", "false");
+        saveEvent("open_modal", source || "unknown", { plan: plan || "" });
+      }
+
+      function closeLeadModal() {
+        leadModal.classList.remove("show");
+        leadModal.setAttribute("aria-hidden", "true");
+      }
+
+      function openPolicy(policyKey) {
+        policyTitle.textContent = policyKey === "privacy" ? "Privacy" : "Terms";
+        policyBody.textContent = policyText[policyKey] || "Policy content not available.";
+        policyModal.classList.add("show");
+        policyModal.setAttribute("aria-hidden", "false");
+        saveEvent("open_policy", policyKey, {});
+      }
+
+      function closePolicy() {
+        policyModal.classList.remove("show");
+        policyModal.setAttribute("aria-hidden", "true");
+      }
+
+      function closeIntro() {
+        intro.classList.add("intro-hidden");
+        siteRoot.classList.add("ready");
+        document.documentElement.classList.remove("intro-lock");
+        document.body.classList.remove("intro-lock");
+      }
+
+      async function resolveIpHint() {
+        if (localStorage.getItem(ipHintKey)) return;
+        try {
+          const response = await fetch("https://api64.ipify.org?format=json", { cache: "no-store" });
+          if (!response.ok) return;
+          const data = await response.json();
+          if (data && data.ip) {
+            localStorage.setItem(ipHintKey, data.ip);
+            setCookie(ipHintKey, data.ip, 30);
+          }
+        } catch (error) {
+          // Ignore network failures and continue with local remember only.
+        }
+      }
+
+      skipIntroBtn.addEventListener("click", closeIntro);
+      setTimeout(closeIntro, 1700);
+
+      const consent = getConsent();
+      if (!consent) {
+        cookieBanner.classList.add("show");
+      } else if (consent === "accepted") {
+        resolveIpHint();
+      }
+
+      document.getElementById("acceptCookies").addEventListener("click", () => setConsent("accepted"));
+      document.getElementById("declineCookies").addEventListener("click", () => setConsent("declined"));
+      document.getElementById("essentialCookies").addEventListener("click", () => setConsent("essential"));
+
+      document.querySelectorAll("[data-auth-mode]").forEach(tab => {
+        tab.addEventListener("click", () => setAuthMode(tab.getAttribute("data-auth-mode")));
+      });
+
+      businessList.addEventListener("click", function (event) {
+        const card = event.target.closest("[data-business-index]");
+        if (!card) return;
+        activeBusinessIndex = Number(card.getAttribute("data-business-index"));
+        activeTaskIndex = 0;
+        renderDemoWorkspace();
+      });
+
+      taskList.addEventListener("click", function (event) {
+        const chip = event.target.closest("[data-task-index]");
+        if (!chip) return;
+        activeTaskIndex = Number(chip.getAttribute("data-task-index"));
+        renderTaskList();
+        renderPipeline();
+      });
+
+      document.addEventListener("click", function (event) {
+        const actionEl = event.target.closest("[data-action]");
+        const trackEl = event.target.closest("[data-track]");
+
+        if (trackEl) {
+          saveEvent("external_click", trackEl.getAttribute("data-track"), {});
+        }
+
+        if (!actionEl) return;
+
+        const action = actionEl.getAttribute("data-action");
+        const source = actionEl.getAttribute("data-source") || actionEl.textContent.trim();
+
+        if (action === "lead-modal") {
+          event.preventDefault();
+          openLeadModal(source, actionEl.getAttribute("data-plan"));
+          return;
+        }
+
+        if (action === "demo-gate") {
+          event.preventDefault();
+          pendingDemoAfterAuth = true;
+          openDemoWorkspace(source);
+          return;
+        }
+
+        if (action === "scroll") {
+          const target = actionEl.getAttribute("data-target");
+          const section = document.querySelector(target);
+          if (section) {
+            section.scrollIntoView({ behavior: "smooth", block: "start" });
+            saveEvent("scroll_to", source, { target: target });
+          }
+          return;
+        }
+
+        if (action === "launch-demo") {
+          event.preventDefault();
+          launchDemo(source);
+          return;
+        }
+
+        if (action === "book-call") {
+          event.preventDefault();
+          openBookCall(source);
+          return;
+        }
+
+        if (action === "logout") {
+          event.preventDefault();
+          logoutVisitor(source);
+          return;
+        }
+
+        if (action === "account") {
+          event.preventDefault();
+          openAccountModal(source);
+          return;
+        }
+
+        if (action === "back-home") {
+          event.preventDefault();
+          closeDemoWorkspace();
+          return;
+        }
+
+        if (action === "policy") {
+          event.preventDefault();
+          openPolicy(actionEl.getAttribute("data-policy"));
+        }
+      });
+
+      document.querySelectorAll("[data-close='lead']").forEach(btn => btn.addEventListener("click", closeLeadModal));
+      document.querySelectorAll("[data-close='policy']").forEach(btn => btn.addEventListener("click", closePolicy));
+      document.querySelectorAll("[data-close='account']").forEach(btn => btn.addEventListener("click", closeAccountModal));
+      accountLogoutBtn.addEventListener("click", () => logoutVisitor("Account Modal"));
+
+      leadModal.addEventListener("click", function (event) {
+        if (event.target === leadModal) closeLeadModal();
+      });
+      policyModal.addEventListener("click", function (event) {
+        if (event.target === policyModal) closePolicy();
+      });
+      accountModal.addEventListener("click", function (event) {
+        if (event.target === accountModal) closeAccountModal();
+      });
+
+      signinForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const formData = new FormData(signinForm);
+        const email = formData.get("email");
+        const existingProfile = getStoredProfile();
+        const matchedLead = findLeadByEmail(email);
+        const normalizedEmail = String(email || "").trim().toLowerCase();
+
+        if (existingProfile && String(existingProfile.email || "").trim().toLowerCase() === normalizedEmail) {
+          markReturningVisitorUI();
+          showToast("Signed in. Demo access unlocked.");
+          closeLeadModal();
+          signinForm.reset();
+          if (pendingDemoAfterAuth) openDemoWorkspace("signin_submit");
+          return;
+        }
+
+        if (matchedLead) {
+          setStoredProfile({
+            name: matchedLead.name,
+            email: matchedLead.email,
+            company: matchedLead.company,
+            plan: matchedLead.plan,
+            ipHint: matchedLead.ipHint || "",
+            savedAt: new Date().toISOString()
+          });
+          markReturningVisitorUI();
+          saveEvent("signin", "signin_form", { email: matchedLead.email, company: matchedLead.company });
+          showToast("Signed in. Demo access unlocked.");
+          closeLeadModal();
+          signinForm.reset();
+          if (pendingDemoAfterAuth) openDemoWorkspace("signin_submit");
+          return;
+        }
+
+        showToast("No access found for this email. Please sign up first.");
+        setAuthMode("signup");
+      });
+
+      leadForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const formData = new FormData(leadForm);
+        const payload = {
+          name: formData.get("name"),
+          email: formData.get("email"),
+          company: formData.get("company"),
+          plan: formData.get("plan"),
+          message: formData.get("message"),
+          ipHint: localStorage.getItem(ipHintKey) || getCookie(ipHintKey) || "",
+          submittedAt: new Date().toISOString()
+        };
+
+        const leads = JSON.parse(localStorage.getItem(leadStorageKey) || "[]");
+        leads.push(payload);
+        localStorage.setItem(leadStorageKey, JSON.stringify(leads.slice(-120)));
+
+        setStoredProfile({
+          name: payload.name,
+          email: payload.email,
+          company: payload.company,
+          plan: payload.plan,
+          ipHint: payload.ipHint,
+          savedAt: payload.submittedAt
+        });
+
+        saveEvent("lead_submit", payload.plan || "unknown", { email: payload.email, company: payload.company });
+        markReturningVisitorUI();
+        showToast("Details saved. You will not be asked to sign in again on this device.");
+        closeLeadModal();
+        leadForm.reset();
+        if (pendingDemoAfterAuth) {
+          openDemoWorkspace("lead_submit");
+        } else {
+          launchDemo("lead_submit");
+        }
+      });
+
+      const revealEls = document.querySelectorAll(".reveal");
+      const observer = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("in-view");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.14 }
+      );
+      revealEls.forEach(el => observer.observe(el));
+
+      window.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          closeLeadModal();
+          closePolicy();
+          closeAccountModal();
+          closeIntro();
+        }
+      });
+
+      markReturningVisitorUI();
+
+      window.AIAS = {
+        getInteractions: function () {
+          return JSON.parse(localStorage.getItem(interactionStorageKey) || "[]");
+        },
+        getLeads: function () {
+          return JSON.parse(localStorage.getItem(leadStorageKey) || "[]");
+        },
+        getProfile: getStoredProfile,
+        logout: logoutVisitor,
+        openAccount: openAccountModal,
+        getConsent: getConsent
+      };
+    })();
+  </script>
+</body>
+</html>
