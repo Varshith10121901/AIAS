@@ -233,7 +233,9 @@ def verify_otp():
     otp_record = OTPModel.get_active_otp(email, purpose)
     if otp_record:
         from datetime import datetime, timezone
-        expires_at = datetime.fromisoformat(otp_record["expires_at"])
+        expires_at = otp_record["expires_at"]
+        if isinstance(expires_at, str):
+            expires_at = datetime.fromisoformat(expires_at)
         remaining = (expires_at - datetime.now(timezone.utc)).total_seconds()
         remaining_seconds = max(0, int(remaining))
         
@@ -459,6 +461,8 @@ def google_login():
 
     google = get_google_client()
     redirect_uri = Config.GOOGLE_REDIRECT_URI or (request.host_url.rstrip("/") + "/auth/google/callback")
+    if Config.FLASK_ENV == "production" and redirect_uri.startswith("http://"):
+        redirect_uri = redirect_uri.replace("http://", "https://", 1)
     return google.authorize_redirect(redirect_uri)
 
 
@@ -467,6 +471,10 @@ def google_callback():
     """Handle Google OAuth callback."""
     try:
         google = get_google_client()
+        redirect_uri = Config.GOOGLE_REDIRECT_URI or (request.host_url.rstrip("/") + "/auth/google/callback")
+        if Config.FLASK_ENV == "production" and redirect_uri.startswith("http://"):
+            redirect_uri = redirect_uri.replace("http://", "https://", 1)
+            
         try:
             token = google.authorize_access_token()
         except Exception as state_err:
@@ -484,7 +492,7 @@ def google_callback():
                     "code": code,
                     "client_id": Config.GOOGLE_CLIENT_ID,
                     "client_secret": Config.GOOGLE_CLIENT_SECRET,
-                    "redirect_uri": Config.GOOGLE_REDIRECT_URI or (request.host_url.rstrip("/") + "/auth/google/callback"),
+                    "redirect_uri": redirect_uri,
                     "grant_type": "authorization_code",
                 }
                 token_resp = http_requests.post(token_url, data=token_data)
@@ -529,7 +537,7 @@ def google_callback():
             if not user["is_google_user"]:
                 from database.db import db
                 db.execute(
-                    "UPDATE users SET is_google_user = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+                    "UPDATE users SET is_google_user = 1, updated_at = GETUTCDATE() WHERE id = ?",
                     (user_id,),
                 )
 

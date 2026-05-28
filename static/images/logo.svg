@@ -1,0 +1,28 @@
+<svg width="512" height="512" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#F3E5AB"/>
+      <stop offset="50%"  stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#AA7C11"/>
+    </linearGradient>
+  </defs>
+  <!-- Hexagon border -->
+  <polygon
+    points="50,5 90,28 90,72 50,95 10,72 10,28"
+    stroke="url(#logoGold)"
+    stroke-width="7"
+    fill="rgba(12,12,12,0.95)"
+  />
+  <!-- A-mark -->
+  <path
+    d="M50 22 L75 75 H61 L50 49 L39 75 H25 L50 22 Z"
+    fill="url(#logoGold)"
+  />
+  <!-- Crossbar -->
+  <path
+    d="M43 60 H57"
+    stroke="#FFFFFF"
+    stroke-width="4"
+    stroke-linecap="round"
+  />
+</svg>

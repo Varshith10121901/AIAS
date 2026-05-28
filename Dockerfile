@@ -1,6 +1,8 @@
 # ── Build Stage ──
 FROM python:3.12-slim AS builder
 
+ENV PIP_NO_CACHE_DIR=1
+
 WORKDIR /build
 COPY requirements.txt .
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
@@ -8,8 +10,14 @@ RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 # ── Production Stage ──
 FROM python:3.12-slim
 
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    DEBIAN_FRONTEND=noninteractive \
+    PORT=5000
+
 # Security: run as non-root
-RUN groupadd -r aias && useradd -r -g aias -d /app -s /sbin/nologin aias
+RUN groupadd -g 1000 aias && useradd -u 1000 -g aias -d /app -s /sbin/nologin aias
 
 WORKDIR /app
 
@@ -19,8 +27,8 @@ COPY --from=builder /install /usr/local
 # Copy application code
 COPY . .
 
-# Create database directory with correct permissions
-RUN mkdir -p /app/database && chown -R aias:aias /app
+# Set ownership
+RUN chown -R aias:aias /app
 
 # Switch to non-root user
 USER aias
@@ -30,7 +38,7 @@ EXPOSE 5000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/')" || exit 1
+    CMD python -c "import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:%s/health' % os.getenv('PORT', '5000'), timeout=4)" || exit 1
 
-# Production entry: gunicorn
-CMD ["python", "-m", "gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--threads", "2", "--timeout", "120", "--access-logfile", "-", "--error-logfile", "-", "app:create_app()"]
+# Production entry: gunicorn (with database init pre-check)
+CMD ["sh", "-c", "python -c 'from database.db import db_manager; res = db_manager.health_check(); print(\"[AIAS] Database check:\", res); assert res[\"status\"] == \"healthy\", \"Database unhealthy\"' && exec python -m gunicorn --bind 0.0.0.0:${PORT:-5000} --workers ${WEB_CONCURRENCY:-4} --threads ${GUNICORN_THREADS:-2} --timeout ${GUNICORN_TIMEOUT:-120} --access-logfile - --error-logfile - 'app:create_app()'"]

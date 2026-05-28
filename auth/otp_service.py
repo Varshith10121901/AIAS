@@ -65,7 +65,9 @@ class OTPService:
             return {"valid": False, "error": "Too many failed attempts. Please request a new code."}
 
         # Check expiry
-        expires_at = datetime.fromisoformat(otp_record["expires_at"])
+        expires_at = otp_record["expires_at"]
+        if isinstance(expires_at, str):
+            expires_at = datetime.fromisoformat(expires_at)
         if datetime.now(timezone.utc) > expires_at:
             OTPModel.mark_used(otp_record["id"])
             return {"valid": False, "error": "Verification code has expired. Please request a new one."}

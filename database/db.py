@@ -1,25 +1,46 @@
 """
-AIAS Database Connection Manager
-Provides secure SQLite connection handling with WAL mode,
-parameterized queries, and automatic table creation.
+AIAS Database Connection Manager for MongoDB
+Provides connection pooling, auto-indexing, health checks, and query helpers.
 """
 
-import os
-import sqlite3
+import logging
 import threading
-from contextlib import contextmanager
+import time
+from datetime import datetime, timezone
+import pymongo
+from bson import ObjectId
 
 from config import Config
 
+# Logger
+logger = logging.getLogger("aias.database")
 
-class Database:
-    """Thread-safe SQLite database manager."""
 
+def sanitize_doc(doc):
+    """
+    Sanitize a MongoDB document for the application.
+    - Maps _id to string id to match the application's SQL expectation.
+    - Ensures all naive datetimes are marked as UTC timezone-aware.
+    """
+    if doc is None:
+        return None
+    doc = dict(doc)
+    if "_id" in doc:
+        doc["id"] = str(doc["_id"])
+    for k, v in doc.items():
+        if isinstance(v, datetime) and v.tzinfo is None:
+            doc[k] = v.replace(tzinfo=timezone.utc)
+    return doc
+
+
+class MongoDBManager:
+    """
+    Singleton manager for MongoDB connection pool, indexes, and health checks.
+    """
     _instance = None
     _lock = threading.Lock()
 
     def __new__(cls):
-        """Singleton pattern — one database instance across the app."""
         if cls._instance is None:
             with cls._lock:
                 if cls._instance is None:
@@ -30,145 +51,146 @@ class Database:
     def __init__(self):
         if self._initialized:
             return
-        self.db_path = Config.DATABASE_PATH
-        self._ensure_directory()
-        self._init_database()
+
+        self._client = None
+        self._db = None
+        self._indexes_setup_done = False
+        self._indexes_setup_lock = threading.Lock()
         self._initialized = True
 
-    def _ensure_directory(self):
-        """Create database directory if it doesn't exist."""
-        db_dir = os.path.dirname(self.db_path)
-        if not os.path.exists(db_dir):
-            os.makedirs(db_dir, exist_ok=True)
+        # Initialize the connection pool
+        self._connect()
 
-    def _get_connection(self):
-        """Create a new connection with security settings."""
-        conn = sqlite3.connect(
-            self.db_path,
-            timeout=30,
-        )
-        conn.row_factory = sqlite3.Row
-        # Security & performance pragmas
-        conn.execute("PRAGMA journal_mode=WAL")        # Write-Ahead Logging for concurrency
-        conn.execute("PRAGMA foreign_keys=ON")          # Enforce foreign key constraints
-        conn.execute("PRAGMA secure_delete=ON")         # Zero-fill deleted data
-        conn.execute("PRAGMA auto_vacuum=FULL")         # Reclaim space automatically
-        conn.execute("PRAGMA busy_timeout=5000")        # Wait 5s on lock contention
-        return conn
-
-    @contextmanager
-    def get_db(self):
-        """Context manager for database connections. Auto-commits or rolls back."""
-        conn = self._get_connection()
+    def _connect(self):
+        """Establish client connection to MongoDB with pooling settings."""
         try:
-            yield conn
-            conn.commit()
-        except Exception:
-            conn.rollback()
+            # Configure MongoClient with reliable defaults
+            self._client = pymongo.MongoClient(
+                Config.MONGO_URI,
+                maxPoolSize=20,
+                minPoolSize=2,
+                serverSelectionTimeoutMS=5000,
+                connectTimeoutMS=5000,
+                socketTimeoutMS=5000,
+                retryWrites=True,
+            )
+            # Access the database from the URI
+            # pymongo.MongoClient(uri).get_default_database() automatically parses database name
+            try:
+                self._db = self._client.get_default_database()
+            except Exception:
+                # Fallback database if none specified in URI
+                self._db = self._client["aias_db"]
+
+            logger.info("[DB] MongoDB client initialized successfully.")
+            self._verify_and_create_indexes()
+        except Exception as exc:
+            logger.critical("[DB] MongoDB client initialization failed: %s", str(exc))
             raise
-        finally:
-            conn.close()
 
-    def execute(self, query, params=(), fetch_one=False, fetch_all=False):
+    @property
+    def db(self):
+        """Get the database object directly."""
+        if self._db is None:
+            self._connect()
+        return self._db
+
+    def _verify_and_create_indexes(self):
+        """Ensure all required database indexes are created thread-safely."""
+        if self._indexes_setup_done:
+            return
+
+        with self._indexes_setup_lock:
+            if self._indexes_setup_done:
+                return
+
+            try:
+                db = self.db
+                # 1. Users collection
+                db.users.create_index("email", unique=True)
+                
+                # 2. OTP Codes collection
+                db.otp_codes.create_index("email")
+                db.otp_codes.create_index("expires_at")
+                
+                # 3. Sessions collection
+                db.sessions.create_index("session_token", unique=True)
+                db.sessions.create_index("user_id")
+                
+                # 4. Rate limit log collection
+                db.rate_limit_log.create_index([("email", pymongo.ASCENDING), ("action", pymongo.ASCENDING)])
+                db.rate_limit_log.create_index("created_at")
+
+                # 5. Bookings collection
+                db.bookings.create_index("email")
+                db.bookings.create_index("created_at")
+
+                self._indexes_setup_done = True
+                logger.info("[DB] MongoDB indexes created/verified successfully.")
+            except Exception as exc:
+                logger.error("[DB] Failed to create/verify MongoDB indexes: %s", str(exc))
+                # Do not re-raise; allow connection to continue since indexing can fail transiently
+
+    def health_check(self):
         """
-        Execute a parameterized query safely.
-        NEVER use string formatting for queries — always use ? placeholders.
+        Check database connectivity and return status report.
         """
-        with self.get_db() as conn:
-            cursor = conn.execute(query, params)
-            if fetch_one:
-                return cursor.fetchone()
-            if fetch_all:
-                return cursor.fetchall()
-            return cursor.lastrowid
+        result = {
+            "service": "MongoDB",
+            "connection_type": "pymongo → SRV → TCP/TLS",
+            "server": "ClusterAtlas",
+            "database": self.db.name if self._db is not None else "unknown",
+            "pooling": "pymongo connection pool",
+            "status": "unhealthy",
+            "latency_ms": None,
+            "error": None,
+        }
+        try:
+            t0 = time.monotonic()
+            # Run ping command to verify connection
+            self.db.command("ping")
+            elapsed = (time.monotonic() - t0) * 1000
+            result["status"] = "healthy"
+            result["latency_ms"] = round(elapsed, 1)
+        except Exception as exc:
+            result["error"] = str(exc)[:300]
+        return result
 
-    def execute_many(self, query, params_list):
-        """Execute a query with multiple parameter sets."""
-        with self.get_db() as conn:
-            conn.executemany(query, params_list)
+    def execute_eval(self, query_str):
+        """
+        Safely execute a MongoDB evaluation string from the Admin interface.
+        Evaluates dynamic Python-like MongoDB queries using local scopes.
+        """
+        # Create safe evaluation scope with db object and utilities
+        scope = {
+            "db": self.db,
+            "ObjectId": ObjectId,
+            "datetime": datetime,
+            "timezone": timezone,
+            "pymongo": pymongo
+        }
 
-    def _init_database(self):
-        """Create all tables on first run."""
-        with self.get_db() as conn:
-            # ---- USERS TABLE ----
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS users (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    email TEXT UNIQUE NOT NULL COLLATE NOCASE,
-                    password_hash TEXT,
-                    display_name TEXT NOT NULL DEFAULT '',
-                    is_google_user INTEGER NOT NULL DEFAULT 0,
-                    is_verified INTEGER NOT NULL DEFAULT 0,
-                    failed_login_attempts INTEGER NOT NULL DEFAULT 0,
-                    locked_until TEXT,
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-            """)
-
-            # ---- OTP TABLE ----
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS otp_codes (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    email TEXT NOT NULL COLLATE NOCASE,
-                    otp_hash TEXT NOT NULL,
-                    purpose TEXT NOT NULL DEFAULT 'signin',
-                    attempts INTEGER NOT NULL DEFAULT 0,
-                    max_attempts INTEGER NOT NULL DEFAULT 5,
-                    is_used INTEGER NOT NULL DEFAULT 0,
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                    expires_at TEXT NOT NULL
-                )
-            """)
-
-            # ---- ACTIVE SESSIONS TABLE ----
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS sessions (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user_id INTEGER NOT NULL,
-                    session_token TEXT UNIQUE NOT NULL,
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-                    expires_at TEXT NOT NULL,
-                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-                )
-            """)
-
-            # ---- RATE LIMIT LOG ----
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS rate_limit_log (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    email TEXT NOT NULL COLLATE NOCASE,
-                    action TEXT NOT NULL,
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-            """)
-
-            # ---- BOOKINGS TABLE (Chatbot leads) ----
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS bookings (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL DEFAULT '',
-                    email TEXT DEFAULT '',
-                    whatsapp TEXT DEFAULT '',
-                    service_needed TEXT DEFAULT '',
-                    budget_range TEXT DEFAULT '',
-                    timeline TEXT DEFAULT '',
-                    problem_statement TEXT DEFAULT '',
-                    source TEXT DEFAULT 'website',
-                    lead_status TEXT DEFAULT 'new',
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-                )
-            """)
-
-            # ---- INDEXES for performance ----
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)")
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_otp_email ON otp_codes(email)")
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_otp_expires ON otp_codes(expires_at)")
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(session_token)")
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)")
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_rate_limit_email ON rate_limit_log(email, action)")
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_bookings_email ON bookings(email)")
+        # Check if the query is a simple command/eval
+        try:
+            # Evaluate expression
+            res = eval(query_str, {"__builtins__": None}, scope)
+            
+            # If it's a cursor, convert to a list of dicts
+            if isinstance(res, pymongo.cursor.Cursor):
+                res = list(res)
+            
+            # Sanitize list or single dict
+            if isinstance(res, list):
+                res = [sanitize_doc(d) if isinstance(d, dict) else d for d in res]
+            elif isinstance(res, dict):
+                res = sanitize_doc(res)
+                
+            return res
+        except Exception as exc:
+            logger.error("[DB] Admin MongoDB eval failed: %s", str(exc))
+            raise
 
 
-# Global database instance
-db = Database()
+# Global database manager and database instance
+db_manager = MongoDBManager()
+db = db_manager.db

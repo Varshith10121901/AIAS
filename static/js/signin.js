@@ -87,8 +87,28 @@ function initRegisterForm() {
     if (!form) return;
 
     const passwordInput = form.querySelector('#password');
+    const confirmInput = form.querySelector('#confirm_password');
+
+    if (confirmInput) {
+        const markInteracted = () => { confirmInput.dataset.userInteracted = 'true'; };
+        confirmInput.addEventListener('focus', markInteracted);
+        confirmInput.addEventListener('input', markInteracted);
+        confirmInput.addEventListener('change', markInteracted);
+        confirmInput.addEventListener('keydown', markInteracted);
+        confirmInput.addEventListener('paste', markInteracted);
+    }
+
     if (passwordInput) {
-        passwordInput.addEventListener('input', () => updatePasswordStrength(passwordInput.value));
+        passwordInput.addEventListener('input', () => {
+            updatePasswordStrength(passwordInput.value);
+            if (confirmInput && document.activeElement === passwordInput) {
+                // If user is typing in password and hasn't interacted with confirm_password,
+                // clear confirm_password to prevent automatic mirroring/autofill.
+                if (!confirmInput.dataset.userInteracted) {
+                    confirmInput.value = '';
+                }
+            }
+        });
     }
 
     form.addEventListener('submit', async (e) => {
@@ -298,9 +318,27 @@ function initResetPasswordForm() {
 
     // Password strength indicator
     const passwordInput = form.querySelector('#password');
+    const confirmInput = form.querySelector('#confirm_password');
+
+    if (confirmInput) {
+        const markInteracted = () => { confirmInput.dataset.userInteracted = 'true'; };
+        confirmInput.addEventListener('focus', markInteracted);
+        confirmInput.addEventListener('input', markInteracted);
+        confirmInput.addEventListener('change', markInteracted);
+        confirmInput.addEventListener('keydown', markInteracted);
+        confirmInput.addEventListener('paste', markInteracted);
+    }
+
     if (passwordInput) {
         passwordInput.addEventListener('input', () => {
             updatePasswordStrength(passwordInput.value);
+            if (confirmInput && document.activeElement === passwordInput) {
+                // If user is typing in password and hasn't interacted with confirm_password,
+                // clear confirm_password to prevent automatic mirroring/autofill.
+                if (!confirmInput.dataset.userInteracted) {
+                    confirmInput.value = '';
+                }
+            }
         });
     }
 

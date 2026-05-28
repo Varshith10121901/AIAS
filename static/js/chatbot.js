@@ -1,7 +1,7 @@
 /* AIAS Aria Chatbot — Full Lead Qualification */
 (function(){
 const CFG={
-  email:"aiasprivateltd@gmail.com",
+  email:"aiasprivatelimited@gmail.com",
   phone:"+91 7022756962",
   calendly:"https://calendly.com/aiasprivateltd",
   supportEmail:"support@aias.in",
@@ -12,17 +12,17 @@ const CFG={
 const SERVICES=["Business Website","Mobile App","AI Automation","AI Chatbot","E-commerce Platform","SaaS Dashboard","API Integration","CRM System","Invoice & Billing Tool","Healthcare Portal","Not sure yet"];
 
 const FOLLOWUP={
-  "Business Website":"Is this a new build or a redesign?",
-  "Mobile App":"Is it for iOS, Android, or both?",
-  "AI Automation":"Which process are you looking to automate?",
-  "AI Chatbot":"Where should the chatbot work — website, WhatsApp, or internal team?",
-  "E-commerce Platform":"Roughly how many products, and are you already on any platform?",
-  "SaaS Dashboard":"Do you have a backend already, or starting from scratch?",
-  "API Integration":"What systems or tools need to connect?",
-  "CRM System":"What are you using today for CRM, if anything?",
-  "Invoice & Billing Tool":"Replacing an existing workflow or starting fresh?",
-  "Healthcare Portal":"Is this for patients, internal staff, or both?",
-  "Not sure yet":"What problem are you trying to solve?"
+  "Business Website":"Nice choice! Are we building this website from scratch, or are we redesigning/updating an existing one?",
+  "Mobile App":"Awesome. Are you targeting iOS, Android, or do you want a cross-platform app that works on both?",
+  "AI Automation":"AI automation can save so much time! What specific business workflows or daily tasks are you hoping to automate?",
+  "AI Chatbot":"Chatbots are great for customer service. Where would you like it to live? (e.g., your website, WhatsApp, Slack, etc.)",
+  "E-commerce Platform":"E-commerce is exciting. Roughly how many products are we talking about, and are you using Shopify/WooCommerce already?",
+  "SaaS Dashboard":"Got it. Do you already have a database or backend set up, or are we starting completely from scratch?",
+  "API Integration":"Connecting systems is key. Which software platforms, databases, or APIs need to talk to each other?",
+  "CRM System":"A good CRM keeps everything organized. What tool is your team using for customer management today?",
+  "Invoice & Billing Tool":"Billing tools save so much headache. Are we replacing a manual invoice process, or building something custom from scratch?",
+  "Healthcare Portal":"Healthcare portals need to be super secure. Will this be used by patients, your clinical staff, or both?",
+  "Not sure yet":"No worries at all! Just tell me a bit about what challenge you're trying to solve or what your goals are."
 };
 
 let step="idle", lead={source:"website",lead_status:"",booking_intent:false,calendly_completed:false}, init=false;
@@ -52,11 +52,14 @@ function inject(){
 <div id="aria-modal">
   <div class="ar-head">
     <div class="ar-head-l">
-      <div class="ar-av">A</div>
+      <div class="ar-av" style="overflow:hidden; background:rgba(12,12,12,0.95);"><img src="/static/images/logo.svg" style="width:100%;height:100%;object-fit:contain;border-radius:50%;" alt="AIAS Logo" /></div>
       <div><div class="ar-nm">Aria · AIAS Assistant</div><div class="ar-st"><span class="ar-dot"></span>Online</div></div>
     </div>
     <div class="ar-head-r">
-      <div class="ar-ct"><span>📧 ${CFG.email}</span><span>📱 ${CFG.phone}</span></div>
+      <div class="ar-ct">
+        <span style="display:flex;align-items:center;justify-content:flex-end;gap:4px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.75;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>${CFG.email}</span>
+        <span style="display:flex;align-items:center;justify-content:flex-end;gap:4px;margin-top:2px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.75;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${CFG.phone}</span>
+      </div>
       <button id="aria-close" class="ar-x" aria-label="Close chat">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -90,7 +93,7 @@ function css(){
 /* ═══ Header ═══ */
 .ar-head{background:#0A0A0A;padding:15px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;transition:background .4s}
 .ar-head-l{display:flex;align-items:center;gap:11px}
-.ar-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#D4AF37,#B88912);color:#0A0A0A;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ar-av{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.05);color:#0A0A0A;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .ar-nm{color:#fff;font-size:13.5px;font-weight:600;transition:color .4s}
 .ar-st{color:rgba(255,255,255,.45);font-size:10.5px;display:flex;align-items:center;gap:4px;margin-top:2px;transition:color .4s}
 .ar-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:ar-p 2s infinite}
@@ -104,15 +107,15 @@ function css(){
 .ar-x:hover{background:rgba(255,255,255,.18);color:#fff}
 
 /* ═══ Messages ═══ */
-.ar-msgs{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth;background:#0a0a0a;transition:background .4s}
+.ar-msgs{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:10px;scroll-behavior:auto;background:#0a0a0a;transition:background .4s}
 .ar-msgs::-webkit-scrollbar{width:3px}
 .ar-msgs::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
-.ar-msg{display:flex;gap:8px;align-items:flex-end;animation:ar-in .2s ease}
-@keyframes ar-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.ar-msg{display:flex;gap:8px;align-items:flex-end;animation:ar-in .25s ease}
+@keyframes ar-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .ar-msg.bot{align-self:flex-start;max-width:84%}
 .ar-msg.usr{align-self:flex-end;flex-direction:row-reverse;max-width:84%}
-.ar-av2{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#D4AF37,#B88912);color:#0A0A0A;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-bottom:2px}
-.ar-b{padding:10px 14px;border-radius:14px;font-size:13.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word;transition:background .4s,color .4s,border-color .4s}
+.ar-av2{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.05);color:#0A0A0A;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-bottom:2px}
+.ar-b{padding:10.5px 14px;border-radius:14px;font-size:13.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word;transition:background .4s,color .4s,border-color .4s}
 .ar-msg.bot .ar-b{background:#1a1a1a;color:#f0f0f0;border:.5px solid #222;border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.15)}
 .ar-msg.usr .ar-b{background:#D4AF37;color:#000;border-bottom-right-radius:4px}
 
@@ -135,10 +138,6 @@ function css(){
 .ar-send{width:36px;height:36px;border-radius:50%;background:#D4AF37;border:none;color:#0A0A0A;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .14s,transform .1s}
 .ar-send:hover{background:#c9a030}
 .ar-send:active{transform:scale(.92)}
-
-/* CTA link */
-.ar-lnk{display:inline-block;margin-top:8px;background:#D4AF37;color:#0A0A0A;font-weight:700;font-size:13px;padding:10px 20px;border-radius:8px;text-decoration:none;transition:opacity .14s}
-.ar-lnk:hover{opacity:.85}
 
 /* ═══════════════════════════════════════════
    LIGHT THEME — triggered by site's class
@@ -216,14 +215,14 @@ function checkPreviousDetailsOrStart() {
   try {
     prev = localStorage.getItem("aria_lead_details");
   } catch(e) {}
-  
+
   if (prev) {
     try {
       const details = JSON.parse(prev);
       if (details && details.name && details.email) {
         step = "confirm_previous";
         delay(600, () => {
-          bot(`Welcome back! I found your details from your previous booking:\n\n👤 Name: ${details.name}\n📧 Email: ${details.email}\n🛠️ Service: ${details.service_needed || "TBD"}\n\nWould you like to book a new call using these same details?`);
+          bot(`Oh, welcome back! I remember you. I've got your details saved from last time:\n\n👤 Name: ${details.name}\n📧 Email: ${details.email}\n🛠️ Service: ${details.service_needed || "TBD"}\n\nShould we use these same details to set up a new call, or would you like to start fresh?`);
           qr(["Yes, use previous details", "No, enter new details"]);
         });
         return;
@@ -243,18 +242,11 @@ function usePreviousDetails(details) {
   lead.timeline = details.timeline;
   lead.problem_statement = details.problem_statement;
   lead.booking_intent = true;
-  
+
   delay(900, () => {
-    bot(`Welcome back, ${lead.name}! 🎯\n\nI've submitted a new booking using your previous details:\n🛠️ Service: ${lead.service_normalized || "TBD"}\n💰 Budget: ${lead.budget_range || "TBD"}\n\nHere's your calendar link to schedule the call:`);
-    const m=document.getElementById("aria-msgs");
-    const w=document.createElement("div");w.className="ar-msg bot";
-    w.innerHTML=`<div class="ar-av2">A</div>`;
-    const a=document.createElement("a");
-    a.href=CFG.calendly;a.target="_blank";a.rel="noopener noreferrer";
-    a.className="ar-lnk";a.textContent="Book Your Call →";
-    w.appendChild(a);m.appendChild(w);scroll();
+    bot(`Welcome back, ${lead.name}! 🎯\n\nI've submitted a new booking using your previous details:\n🛠️ Service: ${lead.service_normalized || "TBD"}\n💰 Budget: ${lead.budget_range || "TBD"}`);
   });
-  
+
   setTimeout(() => {
     delay(800, () => {
       bot(`You're all set! ✅\n\nOur team will review your previous project requirements and come prepared. See you soon! 🚀`);
@@ -269,7 +261,7 @@ function usePreviousDetails(details) {
 function welcome(){
   step="welcome";
   delay(900,()=>{
-    bot(`Hey! Welcome to AIAS. 👋\n\nWe build AI-powered digital products for businesses — from websites and SaaS dashboards to AI automations and mobile apps.\n\nAre you looking to build something new or explore how AIAS can help your team?`);
+    bot(`Hey there! Welcome to AIAS. I'm Aria, and I help our engineering and design team understand exactly what you're looking to build. 😊\n\nWe design and develop high-end websites, mobile apps, SaaS dashboards, and custom AI systems.\n\nAre you here to start a new project, or just looking around for now?`);
     qr(["Yes, I want to build something","Just exploring for now","I want to contact the team"]);
   });
 }
@@ -277,20 +269,29 @@ function welcome(){
 function askService(){
   step="service";
   delay(700,()=>{
-    bot("What best describes what you need?");
+    bot("Awesome! What kind of project do you have in mind? Pick whatever fits best:");
     qr(SERVICES);
   });
 }
 
 function askFollowup(svc){
   step="followup";lead.service_needed=svc;lead.service_normalized=svc;
-  delay(700,()=>{bot(FOLLOWUP[svc]||"Tell me more about what you need.");qr([]);});
+  delay(700,()=>{
+    bot(FOLLOWUP[svc]||"Tell me more about what you need.");
+    if (svc === "Mobile App") {
+      qr(["iOS", "Android", "Cross-Platform (Both)"]);
+    } else if (svc === "Business Website") {
+      qr(["Scratch", "Redesign"]);
+    } else {
+      qr([]);
+    }
+  });
 }
 
 function askBudget(){
   step="budget";
   delay(700,()=>{
-    bot("Just so we prepare the right solution — what's your approximate budget range?");
+    bot("That helps a lot! Just so our architects can suggest the right tech stack — what is your approximate budget for this project?");
     qr(["Under ₹50K","₹50K – ₹2L","₹2L – ₹5L","₹5L+","Let's discuss on the call"]);
   });
 }
@@ -298,44 +299,111 @@ function askBudget(){
 function askTimeline(){
   step="timeline";
   delay(700,()=>{
-    bot("When are you looking to get started?");
+    bot("Got it, we build for projects of all sizes! Let's talk about timing. When would you like to get this project kicked off?");
     qr(["As soon as possible","Within 1 month","1–3 months","Just exploring for now"]);
   });
 }
 
 function askName(){
   step="name";
-  delay(700,()=>{bot("Perfect — I can help set up a free 30-minute architecture call with our team.\n\nWhat's your name?");qr([]);});
+  delay(700,()=>{bot("Perfect. I can set up a free 30-minute brainstorming & architecture call with one of our tech leads so we can map out a solution for you.\n\nFirst, what should I call you?");qr([]);});
 }
 
 function askEmail(){
-  step="email";
-  delay(600,()=>{bot(`Nice to meet you, ${lead.name}! 👋\n\nWhat's your email address?`);qr([]);});
+  const loggedEmail = window.AIAS_CONFIG && window.AIAS_CONFIG.userEmail;
+  if (loggedEmail) {
+    step = "confirm_email";
+    delay(600,()=>{
+      bot(`Wonderful to meet you, ${lead.name}! 👋\n\nI see you are logged in with the email: ${loggedEmail}.\n\nCan we use this email to send your calendar invite and meeting details?`);
+      qr([`Yes, use ${loggedEmail}`, "No, enter manually"]);
+    });
+  } else {
+    step = "email";
+    delay(600,()=>{
+      bot(`Wonderful to meet you, ${lead.name}! 👋\n\nWhat is the best email address to send your calendar invite and meeting details to?`);
+      qr([]);
+    });
+  }
 }
 
 function askWhatsApp(){
   step="whatsapp";
-  delay(600,()=>{bot("And your WhatsApp number? (optional)");qr(["Skip"]);});
+  delay(600,()=>{bot("Got it. Lastly, would you like to drop your WhatsApp number? It's completely optional, but we can send you a quick text reminder before our call.");qr(["Skip"]);});
+}
+
+function askCallType(){
+  step="call_type";
+  delay(600,()=>{
+    bot("Would you prefer a voice call or a video conference for our session?");
+    qr(["Voice Call", "Video Conference"]);
+  });
+}
+
+function askReview(){
+  step="review";
+  delay(600,()=>{
+    const wa = lead.whatsapp && lead.whatsapp.trim() ? lead.whatsapp : "Not provided";
+    const recap = `Please review your details before we finalize your booking:
+
+👤 Name: ${lead.name}
+📧 Email: ${lead.email}
+📱 WhatsApp: ${wa}
+🛠️ Service: ${lead.service_normalized || "TBD"}
+📝 Requirements: ${lead.problem_statement || "TBD"}
+💰 Budget: ${lead.budget_range || "TBD"}
+📅 Timeline: ${lead.timeline || "TBD"}
+📞 Call Type: ${lead.call_type || "Voice Call"}`;
+
+    bot(recap);
+    qr([
+      "Looks good! Confirm call",
+      "Edit Name",
+      "Edit Email",
+      "Edit WhatsApp",
+      "Edit Service",
+      "Edit Budget",
+      "Edit Timeline",
+      "Edit Requirements",
+      "Edit Call Type"
+    ]);
+  });
 }
 
 function doBooking(){
   step="done";lead.booking_intent=true;
-  delay(1100,()=>{
-    bot(`Great, ${lead.name}! 🎯\n\nHere's what happens next:\n✅ You'll get a calendar link by email\n✅ Our team reviews your requirement before the call\n✅ 30-min call — solutions, not sales pitch`);
-    const m=document.getElementById("aria-msgs");
-    const w=document.createElement("div");w.className="ar-msg bot";
-    w.innerHTML=`<div class="ar-av2">A</div>`;
-    const a=document.createElement("a");
-    a.href=CFG.calendly;a.target="_blank";a.rel="noopener noreferrer";
-    a.className="ar-lnk";a.textContent="Book Your Call →";
-    w.appendChild(a);m.appendChild(w);scroll();
+  delay(900,()=>{
+    bot(`Awesome, ${lead.name}! 🎯 Confirming your booking and setting up details...`);
   });
-  setTimeout(()=>{
-    delay(800,()=>{
-      bot(`You're all set, ${lead.name}! ✅\n\nSummary:\n— Service: ${lead.service_normalized||"TBD"}\n— Budget: ${lead.budget_range||"TBD"}\n— Timeline: ${lead.timeline||"TBD"}\n\nOur team will come prepared. See you soon! 🚀`);
+
+  submit(() => {
+    delay(1000, () => {
+      let msg = `You are all set, ${lead.name}! ✅\n\n`;
+      if (lead.call_type === "Video Conference") {
+        let dateStr = "in 72 hours";
+        if (lead.scheduled_at) {
+          try {
+            const dt = new Date(lead.scheduled_at);
+            dateStr = "for " + dt.toLocaleDateString("en-US", {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+          } catch(e) {}
+        }
+        msg += `🎥 Video Conference scheduled ${dateStr}!\nPlatform : Zoom\n(The invite link will be sent to your email: ${lead.email})\n\n`;
+      } else {
+        msg += `📞 Voice Call scheduled! We will contact you on your number: ${lead.whatsapp || lead.email}\n\n`;
+      }
+      msg += `Our engineering team will review your requirements so we don't waste time on the call. Let's build something awesome! 🚀`;
+
+      bot(msg);
       qr(["Ask another question","Contact team directly"]);
       lead.calendly_completed=true;
     });
+
     try {
       localStorage.setItem("aria_lead_details", JSON.stringify({
         name: lead.name,
@@ -344,17 +412,17 @@ function doBooking(){
         service_needed: lead.service_normalized,
         budget_range: lead.budget_range,
         timeline: lead.timeline,
-        problem_statement: lead.problem_statement
+        problem_statement: lead.problem_statement,
+        call_type: lead.call_type
       }));
     } catch(e) {}
-    submit();
-  },3200);
+  });
 }
 
 function showContact(){
   step="idle";
   delay(600,()=>{
-    bot(`You can reach our team directly:\n\n📧 Email: ${CFG.email}\n📱 WhatsApp / Call: ${CFG.phone}\n\nWe typically respond within 24 working hours. Or book a free 30-min call and we'll come prepared!`);
+    bot(`No problem at all! You can reach our team directly at:\n\n[email_icon] Email: ${CFG.email}\n[phone_icon] WhatsApp / Call: ${CFG.phone}\n\nWe'll get back to you within 24 hours. Or, if you change your mind, we can always schedule a free 30-minute tech call right here!`);
     qr(["Book a Call","Back to main"]);
   });
 }
@@ -372,6 +440,15 @@ function handle(txt){
   if(/are you ai|are you a bot|are you human|who are you/.test(lo)){delay(400,()=>{bot("Yes — I'm AIAS's assistant (Aria), here to make sure your call is actually useful. 😊");qr([]);setTimeout(()=>routeStep(lo,txt),600);});return;}
   if(/just brows|no project|maybe later|not now/.test(lo)){delay(500,()=>{bot("No problem! Want a quick overview of what AIAS usually builds?");qr(["Yes, show me","Book a call instead"]);step="exploring";});return;}
   if(/pric|how much|cost|rate|charge/.test(lo)&&step!=="budget"){delay(500,()=>{bot("Pricing depends on scope, features, and timeline — the call helps us give you an exact estimate.\n\nWant to book a quick 30-min discussion?");qr(["Yes, book a call","Tell me more first"]);});return;}
+
+  // Booking intent detection
+  if (/book|call|schedule|meeting|appoint|conf|session|video|voice/.test(lo)) {
+    const captureSteps = ["confirm_previous", "service", "followup", "budget", "timeline", "name", "confirm_email", "email", "whatsapp", "call_type", "review", "edit_name", "edit_email", "edit_whatsapp", "edit_service", "edit_budget", "edit_timeline", "edit_problem", "edit_call_type"];
+    if (!captureSteps.includes(step)) {
+      checkPreviousDetailsOrStart();
+      return;
+    }
+  }
 
   routeStep(lo,txt);
 }
@@ -414,7 +491,7 @@ function routeStep(lo,txt){
 
     case"budget":
       lead.budget_range=txt;
-      if(/low|under|50k|no budget|small/.test(lo)){delay(600,()=>{bot("Got it — we work with budgets of all sizes. Timeline is equally important. When are you looking to start?");qr(["As soon as possible","Within 1 month","1–3 months","Just exploring"]);step="timeline";});}
+      if(/low|under|50k|no budget|small/.test(lo)){delay(600,()=>{bot("Got it, we build for projects of all sizes! Let's talk about timing. When would you like to get this project kicked off?");qr(["As soon as possible","Within 1 month","1–3 months","Just exploring"]);step="timeline";});}
       else askTimeline();
       break;
 
@@ -428,12 +505,130 @@ function routeStep(lo,txt){
       if(txt.length<2){delay(400,()=>{bot("Could you share your name?");});return;}
       lead.name=txt;askEmail();break;
 
+    case"confirm_email":{
+      const loggedEmail = window.AIAS_CONFIG && window.AIAS_CONFIG.userEmail;
+      if (lo.includes("yes") || lo.includes("use") || lo.includes("sure") || lo.includes("ok")) {
+        lead.email = loggedEmail;
+        askWhatsApp();
+      } else {
+        step = "email";
+        delay(400, () => {
+          bot("No problem! Please type the email address you'd prefer to use:");
+          qr([]);
+        });
+      }
+      break;
+    }
+
     case"email":
       if(!txt.includes("@")){delay(400,()=>{bot("Please enter a valid email address.");});return;}
       lead.email=txt;askWhatsApp();break;
 
     case"whatsapp":
-      lead.whatsapp=txt==="Skip"?"":txt;doBooking();break;
+      lead.whatsapp=txt==="Skip"?"":txt;
+      askCallType();
+      break;
+
+    case"call_type":
+      lead.call_type=txt;
+      askReview();
+      break;
+
+    case"review":
+      if(lo.includes("looks good") || lo.includes("confirm")){
+        doBooking();
+      }
+      else if(lo.includes("edit name")){
+        step="edit_name";
+        delay(400,()=>{bot("What is your correct name?");qr([]);});
+      }
+      else if(lo.includes("edit email")){
+        step="edit_email";
+        delay(400,()=>{bot("What is your correct email address?");qr([]);});
+      }
+      else if(lo.includes("edit whatsapp")){
+        step="edit_whatsapp";
+        delay(400,()=>{bot("What is your correct WhatsApp number?");qr(["Skip"]);});
+      }
+      else if(lo.includes("edit service")){
+        step="edit_service";
+        delay(400,()=>{bot("What service are you looking to build?");qr(SERVICES);});
+      }
+      else if(lo.includes("edit budget")){
+        step="edit_budget";
+        delay(400,()=>{bot("What is your budget range?");qr(["Under ₹50K","₹50K – ₹2L","₹2L – ₹5L","₹5L+","Let's discuss on the call"]);});
+      }
+      else if(lo.includes("edit timeline")){
+        step="edit_timeline";
+        delay(400,()=>{bot("What is your timeline?");qr(["As soon as possible","Within 1 month","1–3 months","Just exploring"]);});
+      }
+      else if(lo.includes("edit requirement") || lo.includes("edit problem")){
+        step="edit_problem";
+        delay(400,()=>{
+          bot("Tell me a bit more about your requirements or what you want to build:");
+          if (lead.service_normalized === "Mobile App") {
+            qr(["iOS", "Android", "Cross-Platform (Both)"]);
+          } else if (lead.service_normalized === "Business Website") {
+            qr(["Scratch", "Redesign"]);
+          } else {
+            qr([]);
+          }
+        });
+      }
+      else if(lo.includes("edit call type")){
+        step="edit_call_type";
+        delay(400,()=>{bot("Would you prefer a voice call or a video conference?");qr(["Voice Call", "Video Conference"]);});
+      }
+      else {
+        delay(400,()=>{
+          bot("Please select 'Looks good! Confirm call' or choose a field to edit below.");
+          askReview();
+        });
+      }
+      break;
+
+    case"edit_name":
+      if(txt.length<2){delay(400,()=>{bot("Could you share your correct name?");});return;}
+      lead.name=txt;
+      delay(400,()=>{bot(`Updated! Your name is now: ${lead.name}`); askReview();});
+      break;
+
+    case"edit_email":
+      if(!txt.includes("@")){delay(400,()=>{bot("Please enter a valid email address.");});return;}
+      lead.email=txt;
+      delay(400,()=>{bot(`Updated! Your email is now: ${lead.email}`); askReview();});
+      break;
+
+    case"edit_whatsapp":
+      lead.whatsapp=txt==="Skip"?"":txt;
+      delay(400,()=>{bot(`Updated! Your WhatsApp number is now: ${lead.whatsapp || "Not provided"}`); askReview();});
+      break;
+
+    case"edit_service":
+      lead.service_needed=txt;
+      lead.service_normalized=txt;
+      delay(400,()=>{bot(`Updated! Chosen service is now: ${lead.service_normalized}`); askReview();});
+      break;
+
+    case"edit_budget":
+      lead.budget_range=txt;
+      delay(400,()=>{bot(`Updated! Budget range is now: ${lead.budget_range}`); askReview();});
+      break;
+
+    case"edit_timeline":
+      lead.timeline=txt;
+      delay(400,()=>{bot(`Updated! Timeline is now: ${lead.timeline}`); askReview();});
+      break;
+
+    case"edit_problem":
+      lead.problem_statement=txt;
+      delay(400,()=>{bot(`Updated! Project requirements updated.`); askReview();});
+      break;
+
+    case"edit_call_type":
+      lead.call_type=txt;
+      delay(400,()=>{bot(`Updated! Selected call type is now: ${lead.call_type}`); askReview();});
+      break;
 
     case"done":
       if(/book|call|another|new project/.test(lo)){step="idle";checkPreviousDetailsOrStart();}
@@ -447,7 +642,7 @@ function routeStep(lo,txt){
 }
 
 /* ── Backend ── */
-function submit(){
+function submit(cb){
   fetch("/book-call",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
@@ -459,40 +654,120 @@ function submit(){
       budget_range: lead.budget_range || "",
       timeline: lead.timeline || "",
       problem_statement: lead.problem_statement || "",
+      call_type: lead.call_type || "Voice Call",
       source: lead.source || "website",
       lead_status: lead.booking_intent ? "booked" : "lead",
       timestamp: new Date().toISOString()
     })
-  }).catch(()=>{});
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.zoom_meeting_link) {
+      lead.zoom_meeting_link = data.zoom_meeting_link;
+    }
+    if (data.scheduled_at) {
+      lead.scheduled_at = data.scheduled_at;
+    }
+    if (cb) cb();
+  })
+  .catch(()=>{
+    if (cb) cb();
+  });
 }
 
 /* ── UI helpers ── */
-function bot(txt){
+function bot(txt, cb){
   const m=document.getElementById("aria-msgs");
   const d=document.createElement("div");d.className="ar-msg bot";
-  d.innerHTML=`<div class="ar-av2">A</div><div class="ar-b">${fmt(txt)}</div>`;
-  m.appendChild(d);scroll();
+
+  const av = document.createElement("div");
+  av.className = "ar-av2";
+  av.style.overflow = "hidden";
+  av.innerHTML = `<img src="/static/images/logo.svg" style="width:100%;height:100%;object-fit:contain;border-radius:50%;" />`;
+
+  const b = document.createElement("div");
+  b.className = "ar-b";
+  b.style.opacity = "0";
+  b.style.transform = "translateY(6px)";
+  b.style.transition = "opacity 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)";
+
+  d.appendChild(av);
+  d.appendChild(b);
+  m.appendChild(d);
+  scroll();
+
+  setTimeout(() => {
+    b.style.opacity = "1";
+    b.style.transform = "translateY(0)";
+  }, 20);
+
+  if (!txt) {
+    if (cb) cb();
+    return;
+  }
+
+  // Type 2 characters at a time every 10ms for a super fluid, fast stream
+  let i = 0;
+  let currentText = "";
+
+  function typeChar() {
+    if (i < txt.length) {
+      currentText += txt.slice(i, i + 2);
+      b.innerHTML = fmt(currentText);
+      i += 2;
+      scroll();
+      setTimeout(typeChar, 10);
+    } else {
+      b.innerHTML = fmt(txt);
+      scroll();
+      if (cb) cb();
+    }
+  }
+
+  typeChar();
 }
+
 function userMsg(txt){
   const m=document.getElementById("aria-msgs");
   const d=document.createElement("div");d.className="ar-msg usr";
-  d.innerHTML=`<div class="ar-b">${esc(txt)}</div>`;
-  m.appendChild(d);scroll();
+  d.innerHTML=`<div class="ar-b" style="opacity: 0; transform: translateY(6px); transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);">${esc(txt)}</div>`;
+  m.appendChild(d);
+  scroll();
+  setTimeout(() => {
+    const b = d.querySelector('.ar-b');
+    if (b) {
+      b.style.opacity = "1";
+      b.style.transform = "translateY(0)";
+    }
+  }, 20);
 }
+
 function delay(ms,cb){
   const m=document.getElementById("aria-msgs");
   const r=document.createElement("div");r.className="ar-msg bot";r.id="aria-typ";
-  r.innerHTML=`<div class="ar-av2">A</div><div class="ar-typ"><span class="ar-td"></span><span class="ar-td"></span><span class="ar-td"></span></div>`;
+  r.innerHTML=`<div class="ar-av2" style="overflow:hidden;"><img src="/static/images/logo.svg" style="width:100%;height:100%;object-fit:contain;border-radius:50%;" /></div><div class="ar-typ"><span class="ar-td"></span><span class="ar-td"></span><span class="ar-td"></span></div>`;
   m.appendChild(r);scroll();
   setTimeout(()=>{document.getElementById("aria-typ")?.remove();cb();},ms);
 }
+
 function qr(items){
   const c=document.getElementById("aria-qr");if(!c)return;
   c.innerHTML=items.map(r=>`<button class="ar-qb" type="button">${esc(r)}</button>`).join("");
 }
+
 function clearQr(){const c=document.getElementById("aria-qr");if(c)c.innerHTML="";}
-function scroll(){const m=document.getElementById("aria-msgs");if(m)setTimeout(()=>{m.scrollTop=m.scrollHeight;},60);}
-function fmt(t){return esc(t).replace(/\n/g,"<br>");}
+function scroll(){
+  const m=document.getElementById("aria-msgs");
+  if(m) {
+    m.scrollTop = m.scrollHeight;
+  }
+}
+function fmt(t){
+  let s = esc(t).replace(/\n/g,"<br>");
+  s = s.replace(/\[email_icon\]/g, `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`);
+  s = s.replace(/\[phone_icon\]/g, `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`);
+  return s;
+}
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function send(){
   const i=document.getElementById("aria-inp");

@@ -234,6 +234,55 @@
       background: var(--ds-gold-deep);
       border-color: var(--ds-gold-deep);
     }
+    .nav-welcome {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
+      color: var(--ds-black) !important;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      background: none !important;
+      border: none !important;
+      padding: 0 !important;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .nav-welcome:hover {
+      color: var(--ds-gold) !important;
+    }
+    .welcome-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 0.75rem;
+      background: var(--ds-soft);
+      border: 0.5px solid var(--ds-line);
+      border-radius: 4px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      padding: 1rem;
+      min-width: 220px;
+      z-index: 1000;
+      text-align: left;
+    }
+    .dropdown-link {
+      display: block;
+      color: var(--ds-muted);
+      font-size: 12px;
+      font-weight: 500;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: color 0.2s ease;
+      margin-top: 0.25rem;
+    }
+    .dropdown-link:hover {
+      color: var(--ds-black) !important;
+    }
     .hero {
       padding-top: 4.2rem;
       padding-bottom: 3.4rem;
@@ -1309,12 +1358,46 @@
     .policy-modal.show,
     .account-modal.show { display: flex; }
 
+    body.modal-open {
+      overflow: hidden !important;
+      touch-action: none;
+    }
+
     .modal-card {
       width: min(560px, 96vw);
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
       background: #fff;
       border: 0.5px solid var(--ds-line);
       padding: 1.4rem;
       animation: rise 280ms ease;
+    }
+
+    .policy-modal #policyBody,
+    .account-modal .modal-sub,
+    .lead-modal .modal-sub {
+      overflow-y: auto !important;
+      max-height: 60vh !important;
+      padding-right: 8px;
+    }
+
+    /* Sleek gold scrollbar */
+    .policy-modal #policyBody::-webkit-scrollbar,
+    .account-modal .modal-sub::-webkit-scrollbar,
+    .lead-modal .modal-sub::-webkit-scrollbar {
+      width: 5px;
+    }
+    .policy-modal #policyBody::-webkit-scrollbar-thumb,
+    .account-modal .modal-sub::-webkit-scrollbar-thumb,
+    .lead-modal .modal-sub::-webkit-scrollbar-thumb {
+      background: var(--ds-gold-deep);
+      border-radius: 4px;
+    }
+    .policy-modal #policyBody::-webkit-scrollbar-track,
+    .account-modal .modal-sub::-webkit-scrollbar-track,
+    .lead-modal .modal-sub::-webkit-scrollbar-track {
+      background: var(--ds-soft);
     }
     .modal-head {
       display: flex;
@@ -1618,13 +1701,43 @@
 
   <div class="site" id="siteRoot">
     <nav>
-      <div class="logo">AIAS <span>Platform</span></div>
+      <div class="logo" style="display:flex;align-items:center;gap:10px;">
+        <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0px 2px 8px rgba(212, 175, 55, 0.3)); flex-shrink: 0;">
+          <defs>
+            <linearGradient id="logoGold" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#F3E5AB" />
+              <stop offset="50%" stop-color="#D4AF37" />
+              <stop offset="100%" stop-color="#AA7C11" />
+            </linearGradient>
+          </defs>
+          <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" stroke="url(#logoGold)" stroke-width="7" fill="rgba(12, 12, 12, 0.95)" />
+          <path d="M50 22 L75 75 H61 L50 49 L39 75 H25 L50 22 Z" fill="url(#logoGold)" />
+          <path d="M43 60 H57" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
+        </svg>
+        <span>AIAS <span>Platform</span></span>
+      </div>
       <ul>
         <li><a href="#features">Platform</a></li>
         <li><a href="#how-it-works">How It Works</a></li>
         <li><a href="#use-cases">Use Cases</a></li>
         <li><a href="#pricing">Pricing</a></li>
-        <li><a href="#" id="navPrimaryCta" class="nav-cta" data-action="demo-gate" data-source="Top Nav CTA">See Demo</a></li>
+        <li id="navCtaListItem"><a href="#" id="navPrimaryCta" class="nav-cta" data-action="demo-gate" data-source="Top Nav CTA">See Demo</a></li>
+        <li id="navWelcomeListItem" style="position: relative; display: none;">
+          <a href="#" id="navWelcomeBtn" class="nav-welcome" aria-expanded="false" style="text-decoration: none;">
+            <span id="navWelcomeSpan">Welcome</span>
+            <svg id="welcomeChevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s ease; display: inline-block; vertical-align: middle;">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </a>
+          <div id="navWelcomeDropdown" class="welcome-dropdown">
+            <div style="font-size: 11px; color: var(--ds-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Account Email</div>
+            <div id="dropdownUserEmail" style="font-size: 13px; color: var(--ds-black); word-break: break-all; font-family: var(--sans); text-transform: none;">visitor@example.com</div>
+            <div style="border-top: 0.5px solid var(--ds-line); margin: 0.75rem 0;"></div>
+            <div id="staticDropdownLinks" style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <a href="#" id="staticLogoutLink" class="dropdown-link" style="color: #ff4d4d;">Logout</a>
+            </div>
+          </div>
+        </li>
       </ul>
     </nav>
 
@@ -1702,6 +1815,38 @@
           <h3 class="feature-name">Real-Time AI Analytics and ROI Tracking</h3>
           <p class="feature-benefit">Track execution volume, time saved, and business outcomes in one dashboard with real-time AI analytics.</p>
           <div class="feature-outcome">Outcome: Prove ROI quickly and optimize automation strategy</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="solutions reveal" id="founder-engine" style="background: linear-gradient(180deg, var(--ds-soft) 0%, rgba(212,175,55,0.05) 50%, var(--ds-soft) 100%); border-bottom: 0.5px solid var(--ds-line); padding-top: 3.5rem; padding-bottom: 3.5rem;">
+      <div class="section-tag" style="background: var(--ds-gold-deep); color: #fff; border: none; padding: 4px 10px; font-weight: 600;">AIAS 2.0 FOR FOUNDERS</div>
+      <h2 class="section-title">The Massive Leap from Operations to Product Delivery</h2>
+      <p class="section-copy">Startup founders need proprietary technology assets, not vendor lock-in. AIAS 2.0 compiles native frontends, automates compliance, and exports standard, clean code that you can host anywhere or show to VC investors.</p>
+      
+      <div class="feature-grid">
+        <article class="feature-card" style="position: relative; overflow: hidden; border-left: 3px solid var(--ds-gold-deep);">
+          <h3 class="feature-name">1. True Code Exportability (Zero Lock-In)</h3>
+          <p class="feature-benefit">Outgrown the platform? Click "Eject" to download your workflows compiled as a standardized, beautifully clean Python or Node.js backend with Docker container configurations. Completely independent, ready to deploy to AWS or Google Cloud.</p>
+          <div class="feature-outcome" style="background: rgba(212,175,55,0.1); border-color: var(--ds-gold-deep); color: var(--ds-gold-deep);">100% OWNERSHIP &middot; NO LOCK-IN</div>
+        </article>
+
+        <article class="feature-card" style="position: relative; overflow: hidden; border-left: 3px solid var(--ds-gold-deep);">
+          <h3 class="feature-name">2. Native Frontend Compilation Engine</h3>
+          <p class="feature-benefit">We don't just mock apps—our engine automatically compiles production-ready mobile code frameworks in React Native or Flutter. Access smartphone hardware natively, including background GPS tracking, native camera processing, and encrypted local storage.</p>
+          <div class="feature-outcome" style="background: rgba(212,175,55,0.1); border-color: var(--ds-gold-deep); color: var(--ds-gold-deep);">FLUTTER &amp; REACT NATIVE &middot; NATIVE SDK</div>
+        </article>
+
+        <article class="feature-card" style="position: relative; overflow: hidden; border-left: 3px solid var(--ds-gold-deep);">
+          <h3 class="feature-name">3. App Store Compliance &amp; CI/CD Pipelines</h3>
+          <p class="feature-benefit">Skip the manual submission headache. AIAS auto-generates your App Store privacy policies, runs data tracking compliance checks, orchestrates TestFlight &amp; Google Play Console beta builds, and deploys storefront updates automatically.</p>
+          <div class="feature-outcome" style="background: rgba(212,175,55,0.1); border-color: var(--ds-gold-deep); color: var(--ds-gold-deep);">AUTOMATED COMPLIANCE &middot; CI/CD PIPELINE</div>
+        </article>
+
+        <article class="feature-card" style="position: relative; overflow: hidden; border-left: 3px solid var(--ds-gold-deep);">
+          <h3 class="feature-name">4. Secure Custom Code Sandbox</h3>
+          <p class="feature-benefit">Need custom logic for deep-tech sectors? Inject raw Python, Go, or C++ scripts directly into your automation pipelines. Process complex mathematics, real-time spatial databases, telemetry streams, and hardware telemetry without template restrictions.</p>
+          <div class="feature-outcome" style="background: rgba(212,175,55,0.1); border-color: var(--ds-gold-deep); color: var(--ds-gold-deep);">SECURE CODE SANDBOX &middot; RAW TELEMETRY &amp; GIS</div>
         </article>
       </div>
     </section>
@@ -1994,7 +2139,7 @@
       <div class="footer-links">
         <a data-action="policy" data-policy="privacy">Privacy</a>
         <a data-action="policy" data-policy="terms">Terms</a>
-        <a data-action="lead-modal" data-source="Footer Contact" data-plan="General Inquiry">Contact</a>
+        <a data-action="policy" data-policy="contact" style="cursor: pointer;">Contact</a>
         <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" data-track="LinkedIn Click">LinkedIn</a>
       </div>
     </footer>
@@ -2051,7 +2196,12 @@
     <div class="modal-card">
       <div class="modal-head">
         <h3 class="modal-title" id="authModalTitle">Create Your AIAS Access</h3>
-        <button class="modal-close" type="button" data-close="lead">X</button>
+        <button class="modal-close" type="button" data-close="lead" style="display:flex; align-items:center; justify-content:center; padding:0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
       <p class="modal-sub" id="authModalSub">Submit your details once and we will remember your access on this device, so you are not asked to sign in again.</p>
       <div class="auth-tabs" role="tablist" aria-label="AIAS access">
@@ -2084,7 +2234,12 @@
     <div class="modal-card">
       <div class="modal-head">
         <h3 class="modal-title" id="policyTitle">Policy</h3>
-        <button class="modal-close" type="button" data-close="policy">X</button>
+        <button class="modal-close" type="button" data-close="policy" style="display:flex; align-items:center; justify-content:center; padding:0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
       <p class="modal-sub" id="policyBody"></p>
     </div>
@@ -2094,7 +2249,12 @@
     <div class="modal-card">
       <div class="modal-head">
         <h3 class="modal-title">Your AIAS Account</h3>
-        <button class="modal-close" type="button" data-close="account">X</button>
+        <button class="modal-close" type="button" data-close="account" style="display:flex; align-items:center; justify-content:center; padding:0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
       <p class="modal-sub">This is the access saved on this device. Do you want to continue or logout?</p>
       <div class="account-details" id="accountDetails"></div>
@@ -2139,8 +2299,59 @@
       const BOOK_CALL_URL = "https://cal.com";
 
       const policyText = {
-        privacy: "AIAS stores form details in local browser storage after submission and keeps cookie preference settings to avoid repeated sign-in prompts on the same device.",
-        terms: "This page is a product preview experience. Demo submissions are stored locally in your browser. You can integrate these events with your backend CRM or automation API."
+        privacy: `
+          <div style="font-family: var(--sans); color: var(--ds-black); line-height: 1.6; text-align: left;">
+            <p style="margin-bottom: 1rem; font-weight: 600; color: var(--ds-gold-deep); font-size: 15px; display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ds-black)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>AIAS Founder &amp; Enterprise Data Protection Safeguards</span>
+            </p>
+            <p style="margin-bottom: 0.8rem; font-size: 13px;">We understand that your business data and proprietary workflows are your most valuable intellectual assets. AIAS enforces military-grade protocols to guarantee complete security and safety:</p>
+            <ul style="padding-left: 1.2rem; margin-bottom: 1rem; font-size: 12.5px; display: flex; flex-direction: column; gap: 0.5rem;">
+              <li><strong>End-to-End Encryption:</strong> All sensitive data is secured with AES-256 encryption at rest (Azure SQL Server Transparent Data Encryption) and TLS 1.3 in transit.</li>
+              <li><strong>Zero-Trust Sandboxing:</strong> Custom Python, Go, and C++ pipeline code scripts run inside secure, multi-tenant isolated docker sandboxes, ensuring zero cross-leakage of telemetry or spatial streams.</li>
+              <li><strong>Data Sovereignty:</strong> AIAS does not train public foundation models on your customer datasets, specialized spatial databases, or operational workflows.</li>
+              <li><strong>Regulatory Compliance:</strong> Engineered to align strictly with SOC2 Type II, GDPR, and HIPAA data compliance boundaries.</li>
+              <li><strong>Zero Permanent Logs:</strong> Temporary execution telemetry is automatically purged after 2 hours.</li>
+            </ul>
+            <p style="font-size: 11.5px; color: var(--ds-muted);">Your trust is our ultimate benchmark. If you decide to eject and export your codebase, your database connections are instantly wiped from our active caches.</p>
+          </div>
+        `,
+        terms: `
+          <div style="font-family: var(--sans); color: var(--ds-black); line-height: 1.6; text-align: left;">
+            <p style="margin-bottom: 1rem; font-weight: 600; color: var(--ds-gold-deep); font-size: 15px; display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ds-black)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span>Terms of Service &amp; Intellectual Property Sovereignty</span>
+            </p>
+            <p style="margin-bottom: 0.8rem; font-size: 13px;">AIAS 2.0 is built from the ground up to empower startup founders. Our Terms of Service explicitly protect your ownership rights:</p>
+            <ul style="padding-left: 1.2rem; margin-bottom: 1rem; font-size: 12.5px; display: flex; flex-direction: column; gap: 0.5rem;">
+              <li><strong>100% IP Ownership:</strong> Unlike other low-code platforms, you retain complete, unencumbered ownership of all generated workflows, compiled Flutter/React Native frontends, and exported standalone code.</li>
+              <li><strong>Unconditional Export (Eject):</strong> You have the absolute legal and technical right to click 'Eject/Export' at any time. AIAS will compile your platform assets into raw, standard developer Docker containers that you can host independently on AWS, GCP, or bare metal.</li>
+              <li><strong>Sandbox Terms of Use:</strong> Users are prohibited from executing malicious, destructive, or reverse-engineering scripts inside the custom sandboxes.</li>
+              <li><strong>Platform SLA Guarantee:</strong> We maintain a target uptime of 99.95%. Custom integrations and database channels are fully monitored and isolated to protect performance benchmarks.</li>
+            </ul>
+            <p style="font-size: 11.5px; color: var(--ds-muted);">AIAS is your production build partner—not a vendor lock-in engine. Run on our cloud, or take the keys and run independently.</p>
+          </div>
+        `,
+        contact: `
+          <div style="font-family: var(--sans); color: var(--ds-black); line-height: 1.6; text-align: left;">
+            <p style="margin-bottom: 1.25rem; font-weight: 600; color: var(--ds-gold-deep); font-size: 15px; display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ds-black)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <span>Contact AIAS Support &amp; Sales</span>
+            </p>
+            <p style="margin-bottom: 1.5rem; font-size: 13.5px;">If you have any questions, concerns, or inquiries regarding our platform, custom enterprise integrations, or scheduling, please reach out to us directly:</p>
+            <div style="background-color: var(--ds-soft); border: 0.5px solid var(--ds-line); border-radius: 6px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ds-black)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <span style="font-size: 14px; font-weight: 500; font-family: var(--sans);"><a href="mailto:aiasprivatelimited@gmail.com" style="color: var(--ds-black); text-decoration: none;">aiasprivatelimited@gmail.com</a></span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ds-black)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <span style="font-size: 14px; font-weight: 500; font-family: var(--sans); color: var(--ds-black);">+91 7022756962</span>
+              </div>
+            </div>
+            <p style="font-size: 11.5px; color: var(--ds-muted);">Our team is available 24/7 and will respond to your email or WhatsApp message within 24 hours.</p>
+          </div>
+        `
       };
 
       const consentCookie = "aias_cookie_consent";
@@ -2402,21 +2613,40 @@
 
       function markReturningVisitorUI() {
         const profile = getStoredProfile();
+        const navCtaListItem = document.getElementById("navCtaListItem");
+        const navWelcomeListItem = document.getElementById("navWelcomeListItem");
+        const navWelcomeSpan = document.getElementById("navWelcomeSpan");
+        const dropdownUserEmail = document.getElementById("dropdownUserEmail");
+        const staticDropdownLinks = document.getElementById("staticDropdownLinks");
+
         if (!profile) {
-          if (navPrimaryCta) {
-            navPrimaryCta.textContent = "See Demo";
-            navPrimaryCta.setAttribute("data-action", "demo-gate");
-            navPrimaryCta.setAttribute("data-source", "Top Nav CTA");
-            navPrimaryCta.setAttribute("href", "#");
-          }
+          if (navCtaListItem) navCtaListItem.style.display = "block";
+          if (navWelcomeListItem) navWelcomeListItem.style.display = "none";
           return;
         }
+
         const firstName = getFirstName(profile);
-        if (navPrimaryCta) {
-          navPrimaryCta.textContent = "Welcome " + firstName;
-          navPrimaryCta.setAttribute("data-action", "account");
-          navPrimaryCta.setAttribute("data-source", "Returning Nav Account");
-          navPrimaryCta.setAttribute("href", "#");
+        if (navCtaListItem) navCtaListItem.style.display = "none";
+        if (navWelcomeListItem) {
+          navWelcomeListItem.style.display = "block";
+          if (navWelcomeSpan) navWelcomeSpan.textContent = "Welcome " + firstName;
+          if (dropdownUserEmail) dropdownUserEmail.textContent = profile.email || "visitor@example.com";
+
+          if (staticDropdownLinks) {
+            const existingAdmin = document.getElementById("staticAdminLink");
+            if (existingAdmin) existingAdmin.remove();
+
+            const email = String(profile.email || "").trim().toLowerCase();
+            if (email === "aiasprivatelimited@gmail.com" || email === "varshithkumar815@gmail.com") {
+              const adminLink = document.createElement("a");
+              adminLink.href = "/admin";
+              adminLink.id = "staticAdminLink";
+              adminLink.className = "dropdown-link";
+              adminLink.style.color = "var(--ds-black)";
+              adminLink.textContent = "Admin Console";
+              staticDropdownLinks.insertBefore(adminLink, document.getElementById("staticLogoutLink"));
+            }
+          }
         }
       }
 
@@ -2452,12 +2682,14 @@
           </div>
         `).join("");
 
+        document.body.classList.add("modal-open");
         accountModal.classList.add("show");
         accountModal.setAttribute("aria-hidden", "false");
         saveEvent("open_account", source || "unknown", { email: profile.email || "" });
       }
 
       function closeAccountModal() {
+        document.body.classList.remove("modal-open");
         accountModal.classList.remove("show");
         accountModal.setAttribute("aria-hidden", "true");
       }
@@ -2581,25 +2813,35 @@
         if (handleKnownVisitor(source, plan)) return;
         if (plan) planInput.value = plan;
         setAuthMode(mode || "signup");
+        document.body.classList.add("modal-open");
         leadModal.classList.add("show");
         leadModal.setAttribute("aria-hidden", "false");
         saveEvent("open_modal", source || "unknown", { plan: plan || "" });
       }
 
       function closeLeadModal() {
+        document.body.classList.remove("modal-open");
         leadModal.classList.remove("show");
         leadModal.setAttribute("aria-hidden", "true");
       }
 
+      // ── Policy Modal ──
       function openPolicy(policyKey) {
-        policyTitle.textContent = policyKey === "privacy" ? "Privacy" : "Terms";
-        policyBody.textContent = policyText[policyKey] || "Policy content not available.";
+        const titleMap = {
+          privacy: "Privacy Policy",
+          terms: "Terms of Service",
+          contact: "Contact Details"
+        };
+        policyTitle.textContent = titleMap[policyKey] || "Policy";
+        policyBody.innerHTML = policyText[policyKey] || "Policy content not available.";
+        document.body.classList.add("modal-open");
         policyModal.classList.add("show");
         policyModal.setAttribute("aria-hidden", "false");
         saveEvent("open_policy", policyKey, {});
       }
 
       function closePolicy() {
+        document.body.classList.remove("modal-open");
         policyModal.classList.remove("show");
         policyModal.setAttribute("aria-hidden", "true");
       }
@@ -2840,12 +3082,55 @@
       );
       revealEls.forEach(el => observer.observe(el));
 
+      // ── Welcome Dropdown Toggle ──
+      const welcomeBtn = document.getElementById("navWelcomeBtn");
+      const welcomeDropdown = document.getElementById("navWelcomeDropdown");
+      const welcomeChevron = document.getElementById("welcomeChevron");
+      const staticLogoutLink = document.getElementById("staticLogoutLink");
+
+      if (welcomeBtn && welcomeDropdown) {
+        welcomeBtn.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          const isOpen = welcomeDropdown.style.display === "block";
+          if (isOpen) {
+            welcomeDropdown.style.display = "none";
+            if (welcomeChevron) welcomeChevron.style.transform = "rotate(0deg)";
+            welcomeBtn.setAttribute("aria-expanded", "false");
+          } else {
+            welcomeDropdown.style.display = "block";
+            if (welcomeChevron) welcomeChevron.style.transform = "rotate(180deg)";
+            welcomeBtn.setAttribute("aria-expanded", "true");
+          }
+        });
+
+        document.addEventListener("click", function (event) {
+          if (!welcomeDropdown.contains(event.target) && event.target !== welcomeBtn) {
+            welcomeDropdown.style.display = "none";
+            if (welcomeChevron) welcomeChevron.style.transform = "rotate(0deg)";
+            welcomeBtn.setAttribute("aria-expanded", "false");
+          }
+        });
+      }
+
+      if (staticLogoutLink) {
+        staticLogoutLink.addEventListener("click", function (event) {
+          event.preventDefault();
+          logoutVisitor("Welcome Dropdown");
+        });
+      }
+
       window.addEventListener("keydown", function (event) {
         if (event.key === "Escape") {
           closeLeadModal();
           closePolicy();
           closeAccountModal();
           closeIntro();
+          if (welcomeDropdown) {
+            welcomeDropdown.style.display = "none";
+            if (welcomeChevron) welcomeChevron.style.transform = "rotate(0deg)";
+            if (welcomeBtn) welcomeBtn.setAttribute("aria-expanded", "false");
+          }
         }
       });
 

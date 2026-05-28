@@ -1,18 +1,54 @@
-# Git
+# Secrets and environment
 .env
+.env.*
+!.env.example
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Python/runtime
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+venv/
+.venv/
+env/
+ENV/
+
+# Flask/runtime state
+instance/
+logs/
+*.log
 *.db
 *.db-journal
 *.db-wal
 *.db-shm
-__pycache__/
-*.py[cod]
-venv/
-.venv/
+*.sqlite
+*.sqlite3
+*.rdb
+dump.rdb
+
+# Local Windows Redis bundle; production uses image/service instead.
+Redis/
+
+# Local helpers/artifacts
+fix_db.py
+nul
 
 # Docker
 .dockerignore
-docker-compose.yml
-docker-compose.*.yml
+docker-compose.override.yml
 
 # Kubernetes
 k8s/
@@ -26,10 +62,3 @@ k8s/
 # OS
 Thumbs.db
 .DS_Store
-
-# Misc
-*.log
-.git/
-.gitignore
-README.md
-LICENSE

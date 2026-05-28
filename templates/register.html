@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Create Account — AIAS</title>
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/logo.svg') }}"><link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
     <meta name="description" content="Create your AIAS account with email verification.">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/signin.css') }}">
 
@@ -27,7 +27,7 @@
             <div class="info-content">
                 <div class="auth-brand" style="margin-bottom:2rem;display:flex;align-items:center;gap:12px;">
                     <img src="/static/images/logo.png" alt="AIAS Logo" style="height:44px;width:44px;object-fit:contain;border-radius:8px;box-shadow:0 4px 12px rgba(212,175,55,0.2);" />
-                    <span style="font-family:Georgia,serif;font-size:24px;font-weight:600;color:#fff;letter-spacing:0.04em;">AIAS <span style="color:#D4AF37;">Platform</span></span>
+                    <span style="font-family:Georgia,serif;font-size:24px;font-weight:600;color:var(--text-primary);letter-spacing:0.04em;">AIAS <span style="color:#D4AF37;">Platform</span></span>
                 </div>
                 <h4 class="info-eyebrow">AI SAAS PLATFORM FOR BUSINESS AUTOMATION</h4>
                 <h1 class="info-heading">Build Smarter.<br>Scale Faster.</h1>
@@ -84,6 +84,10 @@
 
         <!-- Right Side: Auth Form -->
         <div class="split-auth">
+            <!-- Close Button -->
+            <a href="/" class="close-btn" title="Back to Homepage">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </a>
             <div class="auth-background">
                 <div class="grid-overlay"></div>
             </div>
@@ -111,7 +115,7 @@
                 <div class="input-group">
                     <label for="display_name">Full Name</label>
                     <div class="input-wrapper">
-                        <input type="text" id="display_name" name="display_name" placeholder="John Doe" required autocomplete="name">
+                        <input type="text" id="display_name" name="display_name" placeholder="Your Name" required autocomplete="name">
                         <span class="input-icon">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                         </span>

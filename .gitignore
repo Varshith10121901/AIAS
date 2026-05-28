@@ -1,11 +1,25 @@
 # Environment variables (NEVER commit)
 .env
+.env.*
+!.env.example
+
+# Local Flask/runtime state
+instance/
+*.log
+logs/
 
 # Database files
 *.db
 *.db-journal
 *.db-wal
 *.db-shm
+*.sqlite
+*.sqlite3
+*.rdb
+dump.rdb
+
+# Local Redis for Windows bundle/runtime files
+Redis/
 
 # Python
 __pycache__/
@@ -13,6 +27,11 @@ __pycache__/
 *$py.class
 *.so
 *.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 dist/
 build/
 *.egg
@@ -21,13 +40,19 @@ build/
 venv/
 .venv/
 env/
+ENV/
 
 # IDE
 .vscode/
 .idea/
+.antigravitycli/
 *.swp
 *.swo
 
 # OS
 Thumbs.db
 .DS_Store
+nul
+
+# One-off local maintenance scripts
+fix_db.py

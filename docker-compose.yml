@@ -6,21 +6,46 @@ services:
     container_name: aias-platform
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "${PORT:-5000}:5000"
     env_file:
       - .env
     environment:
-      - FLASK_ENV=production
-    volumes:
-      # Persist SQLite database outside the container
-      - aias-db:/app/database
+      FLASK_ENV: production
+      PORT: 5000
+      REDIS_URL: redis://aias-redis:6379/0
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-4}
+      GUNICORN_THREADS: ${GUNICORN_THREADS:-2}
+      GUNICORN_TIMEOUT: ${GUNICORN_TIMEOUT:-120}
+    depends_on:
+      aias-redis:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/')"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=4)"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 10s
+    networks:
+      - aias-network
+
+  aias-redis:
+    image: redis:7-alpine
+    container_name: aias-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - aias-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - aias-network
 
 volumes:
-  aias-db:
-    driver: local
+  aias-redis-data:
+
+networks:
+  aias-network:
+    driver: bridge

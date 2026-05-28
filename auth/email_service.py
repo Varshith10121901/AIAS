@@ -8,6 +8,7 @@ import smtplib
 import ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from datetime import datetime
 
 from config import Config
 
@@ -91,7 +92,7 @@ class EmailService:
 </head>
 <body style="margin: 0; padding: 20px; font-family: Arial, sans-serif; background-color: #f9f9f9;">
     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;">
-        
+
         <!-- Logo Header -->
         <div style="padding: 32px 32px 8px 32px;">
             <span style="font-size: 24px; font-family: Georgia, 'Times New Roman', serif; color: #222222;">AIAS</span>
@@ -106,7 +107,7 @@ class EmailService:
         <!-- Body Content -->
         <div style="padding: 32px;">
             <p style="font-size: 16px; color: #3c4043; margin-top: 0;">{greeting}</p>
-            
+
             <p style="font-size: 16px; color: #3c4043; line-height: 1.5;">
                 We received a request to access your AIAS Account <a href="mailto:{recipient_email}" style="color: #1a73e8; text-decoration: none;">{recipient_email}</a> through your email address. Your AIAS verification code is:
             </p>
@@ -198,7 +199,7 @@ class EmailService:
 </head>
 <body style="margin: 0; padding: 20px; font-family: Arial, sans-serif; background-color: #f9f9f9;">
     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden;">
-        
+
         <!-- Logo Header -->
         <div style="padding: 32px 32px 8px 32px;">
             <span style="font-size: 24px; font-family: Georgia, 'Times New Roman', serif; color: #222222;">AIAS</span>
@@ -213,7 +214,7 @@ class EmailService:
         <!-- Body Content -->
         <div style="padding: 32px;">
             <p style="font-size: 16px; color: #3c4043; margin-top: 0;">{greeting}</p>
-            
+
             <p style="font-size: 16px; color: #3c4043; line-height: 1.6;">
                 You've successfully signed in to your AIAS account. We're glad to have you here.
             </p>
@@ -285,97 +286,250 @@ class EmailService:
     @staticmethod
     def send_booking_notification(name="N/A", email="N/A", whatsapp="", service_needed="N/A",
                                   budget_range="N/A", timeline="N/A", problem_statement="",
-                                  timestamp=""):
+                                  call_type="Voice Call", zoom_meeting_link="", timestamp="",
+                                  scheduled_at=None):
         """
-        Send an internal booking notification to the AIAS team email
-        whenever a user books a call via the chatbot.
+        Sends a single professional booking email to both the team and the client.
         """
         if not Config.MAIL_USERNAME or not Config.MAIL_PASSWORD:
             return {"success": False, "error": "Email service not configured."}
 
-        TEAM_EMAIL = "aiasprivateltd@gmail.com"
+        TEAM_EMAIL = "aiasprivatelimited@gmail.com"
 
-        # Build rows for the details table
-        rows = [
+        # Build recipients list
+        recipients = [TEAM_EMAIL]
+        if email and email != "N/A" and "@" in email:
+            recipients.append(email.strip())
+
+        # Format scheduled time nicely
+        formatted_time = ""
+        if scheduled_at:
+            if isinstance(scheduled_at, datetime):
+                formatted_time = scheduled_at.strftime('%A, %B %d, %Y at %I:%M %p (IST)')
+            else:
+                formatted_time = str(scheduled_at)
+
+        # Construct details table rows
+        rows_client = [
             ("Name", name, True),
             ("Email", email, False),
             ("WhatsApp", whatsapp or "Not provided", True),
             ("Service Needed", service_needed, False),
             ("Budget Range", budget_range, True),
             ("Timeline", timeline, False),
-            ("Problem Statement", problem_statement or "Not provided", True),
-            ("Submitted At", timestamp, False),
+            ("Call Type", call_type, True),
         ]
-        table_rows = ""
-        for i, (label, value, shaded) in enumerate(rows):
+        if formatted_time:
+            rows_client.append(("Scheduled Time", formatted_time, False))
+
+        if call_type == "Video Conference":
+            rows_client.append((
+                "Zoom Join Link",
+                f'<a href="{zoom_meeting_link}" style="color:#1a73e8;text-decoration:none;word-break:break-all;">{zoom_meeting_link}</a>' if zoom_meeting_link else "Will be sent via email shortly",
+                len(rows_client) % 2 == 1
+            ))
+
+        table_rows_client = ""
+        for label, value, shaded in rows_client:
             bg = ' style="background:#fdf8ef;"' if shaded else ""
-            table_rows += f"""
+            table_rows_client += f"""
         <tr{bg}>
-          <td style="padding:12px 16px;font-size:13px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;width:160px;border-bottom:1px solid #f0f0f0;">{label}</td>
-          <td style="padding:12px 16px;font-size:15px;color:#1a1a1a;{'font-weight:600;' if i == 0 else ''}border-bottom:1px solid #f0f0f0;">{value}</td>
+          <td class="label-cell" style="padding:12px 16px;font-size:13px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;width:180px;border-bottom:1px solid #f0f0f0;">{label}</td>
+          <td class="value-cell" style="padding:12px 16px;font-size:15px;color:#1a1a1a;border-bottom:1px solid #f0f0f0;">{value}</td>
         </tr>"""
+
+        # Zoom meeting alert box
+        zoom_instructions = ""
+        if call_type == "Video Conference":
+            if zoom_meeting_link:
+                time_str = f" scheduled for <strong>{formatted_time}</strong>" if formatted_time else " scheduled in 72 hours"
+                zoom_instructions = f"""
+          <div class="alert-box" style="background-color: #fdf8ef; border-left: 4px solid #c4a137; padding: 20px 24px; margin: 28px 0; border-radius: 0 8px 8px 0;">
+            <p style="font-size: 15px; color: #222222; margin: 0; font-weight: 600; line-height: 1.5;">
+              🎥 Your Zoom Link is Ready
+            </p>
+            <p style="font-size: 14px; color: #555555; margin: 10px 0 0 0; line-height: 1.5;">
+              Click the link below to join the video conference{time_str}:<br>
+              <a href="{zoom_meeting_link}" style="display:inline-block; margin-top:10px; background:#c4a137; color:#fff; text-decoration:none; padding:10px 18px; border-radius:4px; font-weight:bold; font-size:13px;">Join Zoom Meeting</a>
+            </p>
+          </div>
+                """
+            else:
+                time_str = f" scheduled for <strong>{formatted_time}</strong>" if formatted_time else ""
+                zoom_instructions = f"""
+          <div class="alert-box" style="background-color: #fdf8ef; border-left: 4px solid #c4a137; padding: 20px 24px; margin: 28px 0; border-radius: 0 8px 8px 0;">
+            <p style="font-size: 15px; color: #222222; margin: 0; font-weight: 600; line-height: 1.5;">
+              🎥 Video Meeting Link Pending
+            </p>
+            <p style="font-size: 14px; color: #555555; margin: 10px 0 0 0; line-height: 1.5;">
+              Our team is scheduling your discovery video call{time_str}. We will send you the calendar invite with your unique Zoom meeting link via email shortly.
+            </p>
+          </div>
+                """
+        else:
+            time_str = f" at <strong>{formatted_time}</strong>" if formatted_time else ""
+            zoom_instructions = f"""
+          <div class="alert-box" style="background-color: #fdf8ef; border-left: 4px solid #c4a137; padding: 20px 24px; margin: 28px 0; border-radius: 0 8px 8px 0;">
+            <p style="font-size: 15px; color: #222222; margin: 0; font-weight: 600; line-height: 1.5;">
+              📞 Voice Discovery Call
+            </p>
+            <p style="font-size: 14px; color: #555555; margin: 10px 0 0 0; line-height: 1.5;">
+              Our tech leads will call you{time_str} at your provided contact details (WhatsApp: {whatsapp or 'N/A'}, Email: {email}).
+            </p>
+          </div>
+            """
+
+        # Admin instruction banner (at bottom)
+        admin_banner = f"""
+    <!-- Admin Team Notice -->
+    <div class="admin-notice" style="padding: 20px 32px; background-color: #fafafa; border-top: 1px solid #f0f0f0;">
+      <p style="font-size: 12px; color: #888888; margin: 0; line-height: 1.5;">
+        <strong>Notice for AIAS Team:</strong> A new lead has booked a call. Please contact this lead (Reply-to: {email} / WhatsApp: {whatsapp or 'N/A'}).
+        {f'Scheduled time: {formatted_time}. ' if formatted_time else ''}
+        {'' if call_type != 'Video Conference' else ('Zoom Link: ' + zoom_meeting_link if zoom_meeting_link else '⚠️ Zoom link pending setup. Please schedule the meeting via Admin Panel to create the Zoom link.')}
+      </p>
+    </div>
+        """
 
         html_body = f"""
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin:0;padding:20px;font-family:Arial,sans-serif;background:#f9f9f9;">
-  <div style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;">
-
-    <!-- Header -->
-    <div style="padding:28px 32px 8px 32px;">
-      <span style="font-size:22px;font-family:Georgia,serif;color:#222;">AIAS</span>
-      <span style="font-size:22px;font-family:Georgia,serif;color:#c4a137;">Platform</span>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @media only screen and (max-width: 480px) {{
+      body {{
+        padding: 10px !important;
+      }}
+      .email-card {{
+        border-radius: 6px !important;
+      }}
+      .email-header {{
+        padding: 24px 20px 8px 20px !important;
+      }}
+      .email-title {{
+        padding: 12px 20px !important;
+      }}
+      .email-title h1 {{
+        font-size: 20px !important;
+      }}
+      .email-body {{
+        padding: 20px !important;
+      }}
+      /* Stack table cells on mobile */
+      .info-table tr {{
+        display: block !important;
+        width: 100% !important;
+        border-bottom: 1px solid #f0f0f0 !important;
+        padding: 10px 0 !important;
+        background: none !important;
+      }}
+      .info-table td {{
+        display: block !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 4px 0 !important;
+        border: none !important;
+      }}
+      .info-table td.label-cell {{
+        width: 100% !important;
+        font-size: 11px !important;
+        color: #888888 !important;
+        padding-bottom: 2px !important;
+      }}
+      .info-table td.value-cell {{
+        width: 100% !important;
+        font-size: 14px !important;
+        color: #111111 !important;
+      }}
+      /* Make alert boxes responsive */
+      .alert-box {{
+        padding: 16px 16px !important;
+        margin: 20px 0 !important;
+        border-radius: 6px !important;
+      }}
+      /* Admin notice */
+      .admin-notice {{
+        padding: 16px 20px !important;
+      }}
+    }}
+  </style>
+</head>
+<body style="margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f9f9f9;">
+  <div class="email-card" style="max-width:600px;margin:0 auto;background-color:#ffffff;border:1px solid #e0e0e0;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.05);overflow:hidden;">
+    <div class="email-header" style="padding:32px 32px 8px 32px;">
+      <span style="font-size:24px;font-family:Georgia,serif;color:#222;">AIAS</span>
+      <span style="font-size:24px;font-family:Georgia,serif;color:#c4a137;">Platform</span>
     </div>
-    <div style="padding:14px 32px;border-bottom:1px solid #f0f0f0;">
-      <h1 style="color:#222;margin:0;font-size:22px;font-weight:400;">📅 New Call Booking</h1>
+    <div class="email-title" style="padding:16px 32px;border-bottom:1px solid #f0f0f0;">
+      <h1 style="color:#222;margin:0;font-size:24px;font-weight:400;">Booking Confirmed</h1>
     </div>
-
-    <!-- Body -->
-    <div style="padding:28px 32px;">
-      <p style="font-size:15px;color:#3c4043;margin:0 0 20px;">A new lead has booked a call through the AIAS website chatbot. Here are their details:</p>
-
-      <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
-        {table_rows}
+    <div class="email-body" style="padding:32px;">
+      <p style="font-size:16px;color:#3c4043;margin-top:0;">Hi {name.split(' ')[0]},</p>
+      <p style="font-size:16px;color:#3c4043;line-height:1.6;">
+        Thank you for booking a session with us! We have received your project details and are preparing the right solution for you. Here is a summary of what you shared:
+      </p>
+      <table class="info-table" style="width:100%;border-collapse:collapse;margin:24px 0;">
+        {table_rows_client}
       </table>
-
-      <div style="background:#fdf8ef;border-left:4px solid #c4a137;padding:16px 20px;border-radius:0 8px 8px 0;margin-bottom:20px;">
-        <p style="font-size:14px;color:#222;margin:0;font-weight:600;">Action Required</p>
-        <p style="font-size:13px;color:#555;margin:8px 0 0;">Contact this lead within <strong>24 working hours</strong>. Reply to <strong>{email}</strong>{f' or WhatsApp <strong>{whatsapp}</strong>' if whatsapp else ''}.</p>
-      </div>
-
-      <p style="font-size:13px;color:#888;margin:0;">This notification was sent automatically by the AIAS chatbot system.</p>
+      {zoom_instructions}
+      <p style="font-size:15px;color:#3c4043;line-height:1.6;font-weight:600;">Here is what happens next:</p>
+      <table style="width:100%;margin:16px 0;border-collapse:collapse;">
+        <tr>
+          <td style="padding:8px 12px 8px 0;vertical-align:top;width:24px;color:#c4a137;font-size:16px;font-weight:bold;">1.</td>
+          <td style="padding:8px 0;font-size:14px;color:#3c4043;line-height:1.5;">
+            <strong>Check Your Calendar</strong> — You will receive an invitation to block the slot.
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px 8px 0;vertical-align:top;width:24px;color:#c4a137;font-size:16px;font-weight:bold;">2.</td>
+          <td style="padding:8px 0;font-size:14px;color:#3c4043;line-height:1.5;">
+            <strong>Reviewing Requirements</strong> — Our engineering team will study your scope so we can provide instant value.
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px 8px 0;vertical-align:top;width:24px;color:#c4a137;font-size:16px;font-weight:bold;">3.</td>
+          <td style="padding:8px 0;font-size:14px;color:#3c4043;line-height:1.5;">
+            <strong>Discovery Session</strong> — We will discuss solutions and map out the tech architecture. No hard sales pitch, promise!
+          </td>
+        </tr>
+      </table>
+      <p style="font-size:14px;color:#3c4043;line-height:1.5;margin-top:28px;">
+        Sincerely,<br><br>
+        <strong>The AIAS Team</strong><br>
+        <span style="font-size:13px;color:#888888;font-style:italic;">Building the future of intelligent business.</span>
+      </p>
     </div>
-
-    <!-- Footer -->
-    <div style="padding:16px 32px;background:#fafafa;border-top:1px solid #f0f0f0;text-align:center;">
-      <p style="font-size:12px;color:#999;margin:0;">AIAS Platform · aiasprivateltd@gmail.com · +91 7022756962</p>
-    </div>
+    {admin_banner}
   </div>
 </body>
 </html>
 """
 
         plain = (
-            f"NEW CALL BOOKING — AIAS Platform\n\n"
-            f"Name             : {name}\n"
-            f"Email            : {email}\n"
-            f"WhatsApp         : {whatsapp or 'Not provided'}\n"
-            f"Service Needed   : {service_needed}\n"
-            f"Budget Range     : {budget_range}\n"
-            f"Timeline         : {timeline}\n"
-            f"Problem          : {problem_statement or 'Not provided'}\n"
-            f"Submitted        : {timestamp}\n\n"
-            f"Contact within 24 working hours.\n"
+            f"Booking Confirmed — AIAS Platform\n\n"
+            f"Hi {name},\n\n"
+            f"We've received your request! Here is a recap:\n"
+            f"Service Needed : {service_needed}\n"
+            f"Budget Range   : {budget_range}\n"
+            f"Timeline       : {timeline}\n"
+            f"Call Type      : {call_type}\n"
+            f"{f'Scheduled Time : {formatted_time}' if formatted_time else ''}\n"
+            f"{f'Zoom Meeting   : {zoom_meeting_link}' if zoom_meeting_link else ('Zoom Meeting   : Will be sent via email shortly' if call_type == 'Video Conference' else '')}\n\n"
+            f"We look forward to speaking with you.\n\n"
+            f"— The AIAS Team\n\n"
+            f"Notice for AIAS Team: Contact lead."
         )
 
         msg = MIMEMultipart("alternative")
-        msg["Subject"] = f"📅 New Call Booking: {name} — {service_needed}"
+        msg["Subject"] = f"📅 Booking Confirmed: {name} — {service_needed}"
         msg["From"] = f"{Config.MAIL_SENDER_NAME} <{Config.MAIL_USERNAME}>"
-        msg["To"] = TEAM_EMAIL
+        msg["To"] = ", ".join(recipients)
         msg.attach(MIMEText(plain, "plain"))
         msg.attach(MIMEText(html_body, "html"))
 
+        # Deliver
         try:
             context = ssl.create_default_context()
             with smtplib.SMTP(Config.MAIL_SERVER, Config.MAIL_PORT) as server:
@@ -383,7 +537,7 @@ class EmailService:
                 server.starttls(context=context)
                 server.ehlo()
                 server.login(Config.MAIL_USERNAME, Config.MAIL_PASSWORD)
-                server.sendmail(Config.MAIL_USERNAME, TEAM_EMAIL, msg.as_string())
+                server.sendmail(Config.MAIL_USERNAME, recipients, msg.as_string())
             return {"success": True, "error": None}
         except Exception as e:
             return {"success": False, "error": str(e)}

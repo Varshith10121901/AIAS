@@ -3,8 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Admin Dashboard — AIAS</title>
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    <script>
+      (function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+          document.documentElement.classList.add('light-theme');
+        } else {
+          document.documentElement.classList.remove('light-theme');
+        }
+      })();
+    </script>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/logo.svg') }}"><link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         *{box-sizing:border-box;margin:0;padding:0}
@@ -17,19 +28,42 @@
             --sans:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;
             --mono:'JetBrains Mono',monospace;
             --radius:14px;
+
+            /* Theme specific tweaks */
+            --bg-topbar: rgba(8,8,10,.88);
+            --bg-editor: #0b0b0e;
+            --bg-filter: #0b0b0e;
+            --bg-code: #09090b;
+        }
+        :root.light-theme{
+            --bg:#f8f9fa;--bg2:#ffffff;--bg3:#f1f3f5;--bg4:#e9ecef;
+            --border:#dee2e6;--border2:#ced4da;
+            --text:#1a1a1f;--text2:#4b4b53;--text3:#7c7c8a;
+            --gold:#B88912;--gold2:#916808;--gold-glow:rgba(184,137,18,.1);
+            --green:#198754;--red:#dc3545;--blue:#0d6efd;--purple:#6f42c1;--cyan:#0dcaf0;
+
+            /* Theme specific tweaks */
+            --bg-topbar: rgba(248,249,250,.88);
+            --bg-editor: #ffffff;
+            --bg-filter: #f8f9fa;
+            --bg-code: #f1f3f5;
+        }
+        html.theme-transition,
+        html.theme-transition * {
+            transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease !important;
         }
         body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
         a{color:var(--gold);text-decoration:none}
 
         /* ═══ Top Bar ═══ */
-        .topbar{position:sticky;top:0;z-index:100;background:rgba(8,8,10,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between}
+        .topbar{position:sticky;top:0;z-index:100;background:var(--bg-topbar);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between}
         .topbar-l{display:flex;align-items:center;gap:14px}
         .topbar-logo{font-family:Georgia,serif;font-size:20px;color:var(--text)}
         .topbar-logo span{color:var(--gold)}
         .topbar-badge{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:var(--gold);color:#0A0A0A;padding:3px 10px;border-radius:4px}
         .topbar-r{display:flex;align-items:center;gap:16px}
         .topbar-user{font-size:13px;color:var(--text2)}
-        .topbar-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:500;padding:7px 16px;border-radius:8px;cursor:pointer;transition:all .15s;text-decoration:none}
+        .topbar-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text2);font-family:var(--sans);font-size:12px;font-weight:500;padding:7px 16px;border-radius:8px;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
         .topbar-btn:hover{background:rgba(255,255,255,.1);color:var(--text);border-color:var(--border2)}
 
         /* ═══ Layout ═══ */
@@ -59,7 +93,11 @@
         .stat-card:nth-child(4) .stat-icon svg{stroke:var(--purple)}
 
         /* ═══ Tab Navigation ═══ */
-        .tab-nav{display:flex;gap:4px;margin-bottom:24px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:4px;overflow-x:auto}
+        .tab-nav{display:flex;gap:4px;margin-bottom:24px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:4px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+        .tab-nav::-webkit-scrollbar{height:8px}
+        .tab-nav::-webkit-scrollbar-track{background:transparent}
+        .tab-nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
+        .tab-nav::-webkit-scrollbar-thumb:hover{background:var(--text3)}
         .tab-btn{background:transparent;border:none;color:var(--text3);font-family:var(--sans);font-size:13px;font-weight:500;padding:10px 20px;border-radius:8px;cursor:pointer;transition:all .18s;white-space:nowrap;display:flex;align-items:center;gap:8px}
         .tab-btn:hover{color:var(--text2);background:rgba(255,255,255,.04)}
         .tab-btn.active{background:var(--bg4);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.3)}
@@ -67,12 +105,16 @@
         .tab-btn.active .tab-count{background:var(--gold-glow);color:var(--gold)}
 
         /* ═══ Tab Panel ═══ */
-        .tab-panel{display:none;animation:fadeIn .25s ease}
+        .tab-panel{display:none;animation:fadeIn .25s ease;overflow-x:auto;overflow-y:hidden;padding-bottom:8px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
         .tab-panel.active{display:block}
+        .tab-panel::-webkit-scrollbar{height:8px}
+        .tab-panel::-webkit-scrollbar-track{background:transparent}
+        .tab-panel::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
+        .tab-panel::-webkit-scrollbar-thumb:hover{background:var(--text3)}
         @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
         /* ═══ Section Card ═══ */
-        .section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+        .section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;min-width:980px}
         .section-head{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
         .section-title{font-size:15px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:10px}
         .section-title .dot{width:8px;height:8px;border-radius:50%}
@@ -84,14 +126,17 @@
         .section-count{font-size:11px;font-weight:500;color:var(--text3);background:var(--bg4);padding:3px 10px;border-radius:12px}
 
         /* ═══ Table ═══ */
-        .data-table{width:100%;border-collapse:collapse}
+        .data-table{width:max-content;min-width:100%;border-collapse:collapse}
         .data-table th{text-align:left;padding:12px 20px;font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);background:var(--bg3);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:1}
         .data-table td{padding:14px 20px;font-size:13px;color:var(--text2);border-bottom:1px solid rgba(255,255,255,.03)}
+        .data-table th,.data-table td{white-space:nowrap}
         .data-table tr:hover td{background:rgba(255,255,255,.02);color:var(--text)}
         .data-table tr:last-child td{border-bottom:none}
-        .table-wrap{max-height:520px;overflow-y:auto;overflow-x:auto}
-        .table-wrap::-webkit-scrollbar{width:4px}
-        .table-wrap::-webkit-scrollbar-thumb{background:#333;border-radius:4px}
+        .table-wrap{max-height:520px;overflow:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+        .table-wrap::-webkit-scrollbar{width:8px;height:8px}
+        .table-wrap::-webkit-scrollbar-track{background:transparent}
+        .table-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
+        .table-wrap::-webkit-scrollbar-thumb:hover{background:var(--text3)}
 
         /* Badges */
         .badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;letter-spacing:.03em}
@@ -114,10 +159,302 @@
 
         /* ═══ Empty ═══ */
         .empty{padding:56px 24px;text-align:center;color:var(--text3);font-size:14px}
-        .empty-icon{font-size:36px;margin-bottom:12px;opacity:.4}
+        .empty-icon{width:54px;height:54px;margin:0 auto 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:var(--gold);background:linear-gradient(145deg,rgba(212,175,55,.16),rgba(96,165,250,.07));border:1px solid rgba(212,175,55,.18);box-shadow:0 12px 32px rgba(0,0,0,.18)}
+        .empty-icon svg{width:26px;height:26px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+        .empty-icon.blue{color:var(--blue);background:linear-gradient(145deg,rgba(96,165,250,.16),rgba(212,175,55,.06));border-color:rgba(96,165,250,.2)}
+        .empty-icon.green{color:var(--green);background:linear-gradient(145deg,rgba(74,222,128,.14),rgba(212,175,55,.06));border-color:rgba(74,222,128,.2)}
+        .empty-icon.red{color:var(--red);background:linear-gradient(145deg,rgba(248,113,113,.14),rgba(212,175,55,.06));border-color:rgba(248,113,113,.2)}
+
+        /* ═══ SQL Console ═══ */
+        .sql-console-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+            margin-top: 16px;
+            min-width: 980px;
+        }
+        .console-sidebar {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: 720px;
+            overflow-y: auto;
+        }
+        .console-sidebar::-webkit-scrollbar { width: 4px; }
+        .console-sidebar::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        .console-main {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .editor-container {
+            position: relative;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .sql-editor {
+            width: 100%;
+            height: 180px;
+            background: var(--bg-editor);
+            border: 1px solid var(--border2);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 14px;
+            padding: 14px;
+            resize: vertical;
+            outline: none;
+            line-height: 1.5;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .sql-editor:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.15);
+        }
+        .console-btn-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .btn-run {
+            background: var(--gold);
+            color: #0A0A0A;
+            font-family: var(--sans);
+            font-weight: 600;
+            font-size: 13px;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .btn-run:hover {
+            background: #f1c40f;
+            box-shadow: 0 0 12px var(--gold-glow);
+            transform: translateY(-1px);
+        }
+        .btn-run:active {
+            transform: translateY(0);
+        }
+        .btn-secondary-outline {
+            background: transparent;
+            border: 1px solid var(--border2);
+            color: var(--text2);
+            font-family: var(--sans);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 9px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-secondary-outline:hover {
+            border-color: var(--text3);
+            color: var(--text);
+            background: rgba(255,255,255,0.03);
+        }
+        .schema-header {
+            font-size: 11.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text3);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .schema-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .schema-item {
+            background: var(--bg4);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .schema-item:hover {
+            border-color: var(--border2);
+            background: rgba(255,255,255,0.02);
+        }
+        .schema-name {
+            font-family: var(--mono);
+            font-size: 12.5px;
+            font-weight: 500;
+            color: var(--gold);
+            margin-bottom: 4px;
+        }
+        .schema-cols {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text3);
+            word-break: break-all;
+            line-height: 1.4;
+        }
+        .template-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .template-pill {
+            font-size: 11px;
+            font-weight: 500;
+            background: var(--bg4);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .template-pill:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+        .results-section {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 200px;
+        }
+        .results-head {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .results-title {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--text2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .results-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .results-filter {
+            background: var(--bg-filter);
+            border: 1px solid var(--border2);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 12px;
+            padding: 6px 12px;
+            width: 180px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .results-filter:focus {
+            border-color: var(--gold);
+        }
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.8) brightness(1.2);
+            cursor: pointer;
+            border-radius: 3px;
+            padding: 2px;
+        }
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        html.light-theme input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            filter: none;
+        }
+        html.light-theme input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        .alert-error {
+            background: rgba(248, 113, 113, 0.07);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+            border-radius: 8px;
+            margin: 20px;
+            padding: 16px 20px;
+            color: var(--red);
+        }
+        .alert-error-title {
+            font-weight: 600;
+            font-size: 13.5px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .alert-error-msg {
+            font-family: var(--mono);
+            font-size: 12px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            background: var(--bg-code);
+            padding: 10px 14px;
+            border-radius: 6px;
+            border: 1px solid rgba(248, 113, 113, 0.1);
+        }
+        .alert-success {
+            background: rgba(74, 222, 128, 0.07);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+            border-radius: 8px;
+            margin: 20px;
+            padding: 16px 20px;
+            color: var(--green);
+            font-size: 13.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .console-loader {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            flex-direction: column;
+            gap: 12px;
+            color: var(--text3);
+        }
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--gold);
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
 
         /* ═══ Responsive ═══ */
         @media(max-width:1024px){
+            .sql-console-grid {
+                grid-template-columns: 1fr;
+            }
             .stats-row{grid-template-columns:repeat(2,1fr)}
             .problem-grid{grid-template-columns:1fr}
         }
@@ -129,6 +466,8 @@
             .tab-nav{border-radius:10px}
             .tab-btn{padding:8px 14px;font-size:12px}
             .data-table td,.data-table th{padding:10px 14px;font-size:12px}
+            .section{min-width:860px}
+            .sql-console-grid{min-width:860px}
         }
     </style>
 </head>
@@ -144,7 +483,13 @@
         </div>
         <div class="topbar-r">
             <span class="topbar-user">{{ admin_email }}</span>
-            <a href="{{ url_for('index') }}" class="topbar-btn">← Back to Site</a>
+            <button id="themeToggle" class="topbar-btn" style="display:flex;align-items:center;justify-content:center;padding:7px 10px;cursor:pointer;" title="Toggle Light/Dark Theme">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform: rotate(40deg);"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+            <a href="{{ url_for('index') }}" class="topbar-btn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                Back to Site
+            </a>
             <a href="{{ url_for('auth.signout') }}" class="topbar-btn">Sign Out</a>
         </div>
     </header>
@@ -200,6 +545,14 @@
                 Security Logs
                 <span class="tab-count">{{ rate_logs|length }}</span>
             </button>
+            <button class="tab-btn" data-tab="query" role="tab" aria-selected="false">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="13" y2="13"/></svg>
+                MongoDB Console
+            </button>
+            <button class="tab-btn" data-tab="redis" role="tab" aria-selected="false">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                Redis Cache
+            </button>
         </div>
 
         <!-- ═══════════════════════════════════════════ -->
@@ -223,6 +576,8 @@
                             <th>Service</th>
                             <th>Budget</th>
                             <th>Timeline</th>
+                            <th>Call Type</th>
+                            <th>Meeting Setup</th>
                             <th>Status</th>
                             <th>Date</th>
                         </tr>
@@ -238,6 +593,54 @@
                             <td>{{ b.budget_range or '—' }}</td>
                             <td>{{ b.timeline or '—' }}</td>
                             <td>
+                                {% if b.call_type == 'Video Conference' %}
+                                    <span class="badge badge-purple" style="display:inline-flex;align-items:center;gap:4px;">
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                                        Video
+                                    </span>
+                                {% else %}
+                                    <span class="badge badge-blue" style="display:inline-flex;align-items:center;gap:4px;">
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                        Voice
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div id="schedule-cell-{{ b.id }}">
+                                {% if b.scheduled_at %}
+                                    {% if b.call_type == 'Video Conference' and b.zoom_meeting_link %}
+                                        <a href="{{ b.zoom_meeting_link }}" target="_blank" class="badge badge-green" style="display:inline-flex;align-items:center;gap:4px;margin-bottom:4px;">
+                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                            Zoom Link
+                                        </a>
+                                    {% endif %}
+                                    <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:6px;" id="disp-time-{{ b.id }}">
+                                        {{ b.scheduled_at.strftime('%Y-%m-%d %H:%M') }}
+                                    </div>
+                                    <button onclick="toggleReschedule('{{ b.id }}')" class="btn-secondary-outline" style="padding:2px 8px;font-size:10px;border-radius:4px;" id="btn-toggle-{{ b.id }}">Reschedule</button>
+                                    <div id="reschedule-form-{{ b.id }}" style="display:none;margin-top:8px;flex-direction:column;gap:6px;">
+                                        <input type="datetime-local" class="results-filter" id="dt-{{ b.id }}" onclick="try { this.showPicker(); } catch(e) {}" onfocus="try { this.showPicker(); } catch(e) {}" style="width:180px;padding:4px 8px;font-size:11px;background:var(--bg3);height:auto;cursor:pointer;" value="{{ b.scheduled_at.strftime('%Y-%m-%dT%H:%M') if b.scheduled_at else '' }}">
+                                        <button onclick="submitSchedule('{{ b.id }}', '{{ b.call_type }}')" class="btn-run" style="padding:4px 12px;font-size:11px;border-radius:4px;width:fit-content;">Save & Email</button>
+                                    </div>
+                                {% else %}
+                                    <div style="display:flex;flex-direction:column;gap:6px;">
+                                        <input type="datetime-local" class="results-filter" id="dt-{{ b.id }}" onclick="try { this.showPicker(); } catch(e) {}" onfocus="try { this.showPicker(); } catch(e) {}" style="width:180px;padding:4px 8px;font-size:11px;background:var(--bg3);height:auto;cursor:pointer;">
+                                        {% if b.call_type == 'Video Conference' %}
+                                            <button onclick="submitSchedule('{{ b.id }}', '{{ b.call_type }}')" class="btn-run" style="padding:4px 12px;font-size:11px;border-radius:4px;width:fit-content;display:flex;align-items:center;gap:4px;">
+                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                                Schedule Zoom
+                                            </button>
+                                        {% else %}
+                                            <button onclick="submitSchedule('{{ b.id }}', '{{ b.call_type }}')" class="btn-secondary-outline" style="padding:4px 12px;font-size:11px;border-radius:4px;width:fit-content;display:flex;align-items:center;gap:4px;">
+                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                                Confirm Call
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                                </div>
+                            </td>
+                            <td id="status-cell-{{ b.id }}">
                                 {% if b.lead_status == 'booked' %}
                                     <span class="badge badge-green">Booked</span>
                                 {% elif b.lead_status == 'new' %}
@@ -246,7 +649,7 @@
                                     <span class="badge badge-gray">{{ b.lead_status }}</span>
                                 {% endif %}
                             </td>
-                            <td style="font-size:12px;color:var(--text3);font-family:var(--mono);">{{ b.created_at[:16] if b.created_at else '—' }}</td>
+                            <td style="font-size:12px;color:var(--text3);font-family:var(--mono);">{{ b.created_at.strftime('%Y-%m-%d %H:%M') if b.created_at else '—' }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -254,7 +657,9 @@
                 </div>
                 {% else %}
                 <div class="empty">
-                    <div class="empty-icon">📭</div>
+                    <div class="empty-icon">
+                        <svg viewBox="0 0 24 24"><path d="M4 5h16l-2 10H6L4 5Z"/><path d="M6 15v3a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-3"/><path d="M9 11h6"/></svg>
+                    </div>
                     No bookings yet. Leads from the chatbot will appear here.
                 </div>
                 {% endif %}
@@ -311,7 +716,7 @@
                                     <span style="color:var(--text3);">0</span>
                                 {% endif %}
                             </td>
-                            <td style="font-size:12px;color:var(--text3);font-family:var(--mono);">{{ u.created_at[:16] if u.created_at else '—' }}</td>
+                            <td style="font-size:12px;color:var(--text3);font-family:var(--mono);">{{ u.created_at.strftime('%Y-%m-%d %H:%M') if u.created_at else '—' }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -319,7 +724,9 @@
                 </div>
                 {% else %}
                 <div class="empty">
-                    <div class="empty-icon">👥</div>
+                    <div class="empty-icon blue">
+                        <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
                     No users registered yet.
                 </div>
                 {% endif %}
@@ -354,7 +761,9 @@
                 </div>
                 {% else %}
                 <div class="empty">
-                    <div class="empty-icon">📝</div>
+                    <div class="empty-icon green">
+                        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/></svg>
+                    </div>
                     No user requirements captured yet. Problem statements from the chatbot will show here as cards.
                 </div>
                 {% endif %}
@@ -395,7 +804,7 @@
                                     <span class="badge badge-gray">{{ r.action }}</span>
                                 {% endif %}
                             </td>
-                            <td style="font-size:12px;color:var(--text3);font-family:var(--mono);">{{ r.created_at[:19] if r.created_at else '—' }}</td>
+                            <td style="font-size:12px;color:var(--text3);font-family:var(--mono);">{{ r.created_at.strftime('%Y-%m-%d %H:%M:%S') if r.created_at else '—' }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -403,10 +812,157 @@
                 </div>
                 {% else %}
                 <div class="empty">
-                    <div class="empty-icon">🛡️</div>
+                    <div class="empty-icon red">
+                        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="M9 12l2 2 4-4"/></svg>
+                    </div>
                     No security logs recorded yet.
                 </div>
                 {% endif %}
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- TAB 5: MongoDB Console                     -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="tab-panel" id="tab-query" role="tabpanel">
+            <div class="sql-console-grid">
+                <!-- Sidebar Schema -->
+                <div class="console-sidebar">
+                    <div class="schema-header">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20M4 19.5V3.5A2.5 2.5 0 0 1 6.5 1H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5z"/></svg>
+                        MongoDB Collections
+                    </div>
+                    <div class="schema-list">
+                        <div class="schema-item" data-table="users" onclick="setQuery('db.users.find().sort(\'created_at\', -1).limit(100)')">
+                            <div class="schema-name">users</div>
+                            <div class="schema-cols">_id, email, password_hash, display_name, is_google_user, is_verified, failed_login_attempts, locked_until, created_at, updated_at</div>
+                        </div>
+                        <div class="schema-item" data-table="bookings" onclick="setQuery('db.bookings.find().sort(\'created_at\', -1).limit(100)')">
+                            <div class="schema-name">bookings</div>
+                            <div class="schema-cols">_id, name, email, whatsapp, service_needed, budget_range, timeline, problem_statement, source, lead_status, created_at</div>
+                        </div>
+                        <div class="schema-item" data-table="sessions" onclick="setQuery('db.sessions.find().sort(\'created_at\', -1).limit(100)')">
+                            <div class="schema-name">sessions</div>
+                            <div class="schema-cols">_id, user_id, session_token, created_at, expires_at</div>
+                        </div>
+                        <div class="schema-item" data-table="otp_codes" onclick="setQuery('db.otp_codes.find().sort(\'created_at\', -1).limit(100)')">
+                            <div class="schema-name">otp_codes</div>
+                            <div class="schema-cols">_id, email, otp_hash, purpose, attempts, max_attempts, is_used, created_at, expires_at</div>
+                        </div>
+                        <div class="schema-item" data-table="rate_limit_log" onclick="setQuery('db.rate_limit_log.find().sort(\'created_at\', -1).limit(100)')">
+                            <div class="schema-name">rate_limit_log</div>
+                            <div class="schema-cols">_id, email, action, created_at</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Console -->
+                <div class="console-main">
+                    <div class="editor-container">
+                        <div class="schema-header">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                            MongoDB Editor
+                        </div>
+                        <textarea id="query-textarea" class="sql-editor" placeholder="# Write your MongoDB query here. Press Ctrl + Enter to execute.&#10;db.bookings.find().sort('created_at', -1).limit(100)"></textarea>
+
+                        <div class="console-btn-row">
+                            <div class="template-pills">
+                                <span class="template-pill" onclick="setQuery('db.users.find({\'is_verified\': True})')">Verified Users</span>
+                                <span class="template-pill" onclick="setQuery('db.bookings.find({\'lead_status\': \'new\'})')">New Leads</span>
+                                <span class="template-pill" onclick="setQuery('db.rate_limit_log.find({\'action\': {\'$regex\': \'failed\'}})')">Failed Logins</span>
+                                <span class="template-pill" onclick="setQuery('db.bookings.find({\'problem_statement\': {\'$ne\': None, \'$ne\': \'\'}}, {\'name\': 1, \'email\': 1, \'problem_statement\': 1})')">Requirements</span>
+                            </div>
+                            <div style="display:flex;gap:8px;">
+                                <button class="btn-secondary-outline" onclick="clearConsole()">Clear</button>
+                                <button class="btn-run" id="btn-execute" onclick="runCustomQuery()">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                    Run Query
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div class="results-section">
+                        <div class="results-head">
+                            <div class="results-title" id="results-title">
+                                <span class="dot dot-blue"></span>
+                                Results
+                            </div>
+                            <div class="results-actions" id="results-actions" style="display:none;">
+                                <input type="text" class="results-filter" id="results-filter" placeholder="Filter results..." oninput="filterResultsTable()">
+                                <button class="btn-secondary-outline" onclick="exportData('csv')">Export CSV</button>
+                                <button class="btn-secondary-outline" onclick="exportData('json')">Export JSON</button>
+                            </div>
+                        </div>
+
+                        <!-- Loader -->
+                        <div class="console-loader" id="console-loader">
+                            <div class="spinner"></div>
+                            <span>Executing query against MongoDB...</span>
+                        </div>
+
+                        <!-- Content wrapper -->
+                        <div id="query-results-container">
+                            <div class="empty">
+                                <div class="empty-icon">
+                                    <svg viewBox="0 0 24 24"><path d="M4 17l6-6-6-6"/><path d="M12 19h8"/><path d="M12 5h8"/></svg>
+                                </div>
+                                Write or select a query above and click "Run Query" to see data.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- TAB 6: Redis Cache Console                 -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="tab-panel" id="tab-redis" role="tabpanel">
+            <div class="section">
+                <div class="section-head">
+                    <div class="section-title"><span class="dot dot-gold"></span>Redis Cache Inspector</div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn-secondary-outline" style="padding: 6px 12px; font-size:12px;" onclick="loadRedisConsole()">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:2px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                            Refresh
+                        </button>
+                        <button class="btn-run" style="padding: 6px 14px; font-size:12px; background:var(--red); color:#fff;" onclick="flushRedisCache()">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:2px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                            Flush Cache
+                        </button>
+                    </div>
+                </div>
+
+                <div style="padding:24px; display:flex; flex-direction:column; gap:20px;">
+                    <!-- Status & Stats Row -->
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:16px;" id="redis-stats-container">
+                        <!-- Will be populated dynamically -->
+                    </div>
+
+                    <!-- Keys Table Section -->
+                    <div class="table-wrap" style="margin-top:10px;">
+                        <div style="font-size:13px; font-weight:600; color:var(--text); margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            Cached Keys in Database
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Key Name</th>
+                                    <th>Data Type</th>
+                                    <th>TTL (Seconds)</th>
+                                    <th>Value Preview</th>
+                                    <th style="width: 80px; text-align:center;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="redis-keys-table-body">
+                                <!-- Will be populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -423,8 +979,559 @@
                 btn.setAttribute('aria-selected','true');
                 const panel = document.getElementById('tab-' + btn.dataset.tab);
                 if (panel) panel.classList.add('active');
+
+                // Auto-load Redis status if switching to Redis console
+                if (btn.dataset.tab === 'redis') {
+                    loadRedisConsole();
+                }
             });
         });
+
+        // Theme switching handler
+        const themeBtn = document.getElementById('themeToggle');
+        if (themeBtn) {
+            themeBtn.addEventListener('click', () => {
+                document.documentElement.classList.add('theme-transition');
+                const isLight = document.documentElement.classList.toggle('light-theme');
+                localStorage.setItem('theme', isLight ? 'light' : 'dark');
+                setTimeout(() => {
+                    document.documentElement.classList.remove('theme-transition');
+                }, 250);
+            });
+        }
+
+        // ── Admin Scheduling Actions ──
+        function toggleReschedule(bookingId) {
+            const form = document.getElementById('reschedule-form-' + bookingId);
+            const btn = document.getElementById('btn-toggle-' + bookingId);
+            if (form.style.display === 'none') {
+                form.style.display = 'flex';
+                btn.textContent = 'Cancel';
+            } else {
+                form.style.display = 'none';
+                btn.textContent = 'Reschedule';
+            }
+        }
+
+        async function submitSchedule(bookingId, callType) {
+            const dtInput = document.getElementById('dt-' + bookingId);
+            const dateVal = dtInput.value;
+            if (!dateVal) {
+                alert('Please select a date and time first.');
+                return;
+            }
+
+            const cell = document.getElementById('schedule-cell-' + bookingId);
+            
+            // Disable all interactive controls and make transparent (translucent)
+            const inputsAndButtons = cell.querySelectorAll('input, button');
+            inputsAndButtons.forEach(el => el.disabled = true);
+            cell.style.opacity = '0.5';
+            cell.style.pointerEvents = 'none';
+
+            // Find or create inline status indicator
+            let statusIndicator = cell.querySelector('.inline-loading-status');
+            if (!statusIndicator) {
+                statusIndicator = document.createElement('div');
+                statusIndicator.className = 'inline-loading-status';
+                statusIndicator.style.display = 'flex';
+                statusIndicator.style.alignItems = 'center';
+                statusIndicator.style.gap = '6px';
+                statusIndicator.style.fontSize = '11px';
+                statusIndicator.style.color = 'var(--text2)';
+                statusIndicator.style.marginTop = '6px';
+                statusIndicator.innerHTML = `
+                    <div class="spinner" style="width:11px;height:11px;border-width:1.5px;margin-right:2px;"></div>
+                    <span>Sending...</span>
+                `;
+                cell.appendChild(statusIndicator);
+            }
+
+            try {
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+
+                const res = await fetch('/admin/schedule-meeting', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({
+                        booking_id: bookingId,
+                        scheduled_at: dateVal
+                    })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    // Update status badge
+                    const statusCell = document.getElementById('status-cell-' + bookingId);
+                    if (statusCell) {
+                        statusCell.innerHTML = '<span class="badge badge-green">Booked</span>';
+                    }
+
+                    // Format local display date
+                    const localDt = new Date(data.scheduled_at);
+                    const formattedDate = localDt.getFullYear() + '-' +
+                                          String(localDt.getMonth() + 1).padStart(2, '0') + '-' +
+                                          String(localDt.getDate()).padStart(2, '0') + ' ' +
+                                          String(localDt.getHours()).padStart(2, '0') + ':' +
+                                          String(localDt.getMinutes()).padStart(2, '0');
+
+                    // Update scheduling cell
+                    let newHtml = '';
+                    if (callType === 'Video Conference' && data.zoom_meeting_link) {
+                        newHtml += `
+                            <a href="${escapeHtml(data.zoom_meeting_link)}" target="_blank" class="badge badge-green" style="display:inline-flex;align-items:center;gap:4px;margin-bottom:4px;">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                Zoom Link
+                            </a>
+                        `;
+                    }
+                    newHtml += `
+                        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:6px;" id="disp-time-${bookingId}">
+                            ${escapeHtml(formattedDate)}
+                        </div>
+                        <button onclick="toggleReschedule('${bookingId}')" class="btn-secondary-outline" style="padding:2px 8px;font-size:10px;border-radius:4px;" id="btn-toggle-${bookingId}">Reschedule</button>
+                        <div id="reschedule-form-${bookingId}" style="display:none;margin-top:8px;flex-direction:column;gap:6px;">
+                            <input type="datetime-local" class="results-filter" id="dt-${bookingId}" onclick="try { this.showPicker(); } catch(e) {}" onfocus="try { this.showPicker(); } catch(e) {}" style="width:180px;padding:4px 8px;font-size:11px;background:var(--bg3);height:auto;cursor:pointer;" value="${escapeHtml(dateVal)}">
+                            <button onclick="submitSchedule('${bookingId}', '${escapeHtml(callType)}')" class="btn-run" style="padding:4px 12px;font-size:11px;border-radius:4px;width:fit-content;">Save & Email</button>
+                        </div>
+                    `;
+                    cell.style.opacity = '1';
+                    cell.style.pointerEvents = 'auto';
+                    cell.innerHTML = newHtml;
+                } else {
+                    alert('Scheduling failed: ' + (data.error || 'Unknown error'));
+                    // Restore interactive state
+                    inputsAndButtons.forEach(el => el.disabled = false);
+                    cell.style.opacity = '1';
+                    cell.style.pointerEvents = 'auto';
+                    if (statusIndicator) statusIndicator.remove();
+                }
+            } catch (err) {
+                alert('Network error: ' + err.message);
+                // Restore interactive state
+                inputsAndButtons.forEach(el => el.disabled = false);
+                cell.style.opacity = '1';
+                cell.style.pointerEvents = 'auto';
+                if (statusIndicator) statusIndicator.remove();
+            }
+        }
+
+        // ── MongoDB Console Actions ──
+        let lastQueryResult = null;
+
+        function setQuery(q) {
+            const txt = document.getElementById('query-textarea');
+            txt.value = q;
+            txt.focus();
+        }
+
+        function clearConsole() {
+            document.getElementById('query-textarea').value = '';
+            resetResults();
+        }
+
+        function resetResults() {
+            lastQueryResult = null;
+            document.getElementById('results-actions').style.display = 'none';
+            document.getElementById('results-title').innerHTML = '<span class="dot dot-blue"></span>Results';
+            document.getElementById('query-results-container').innerHTML = `
+                <div class="empty">
+                    <div class="empty-icon">
+                        <svg viewBox="0 0 24 24"><path d="M4 17l6-6-6-6"/><path d="M12 19h8"/><path d="M12 5h8"/></svg>
+                    </div>
+                    Write or select a query above and click "Run Query" to see data.
+                </div>
+            `;
+        }
+
+        async function runCustomQuery() {
+            const btn = document.getElementById('btn-execute');
+            if (btn && btn.disabled) return;
+
+            const query = document.getElementById('query-textarea').value.trim();
+            if (!query) {
+                alert('Please enter a query first.');
+                return;
+            }
+
+            const loader = document.getElementById('console-loader');
+            const container = document.getElementById('query-results-container');
+            const actions = document.getElementById('results-actions');
+            const titleEl = document.getElementById('results-title');
+
+            // Set loading state
+            loader.style.display = 'flex';
+            container.innerHTML = '';
+            actions.style.display = 'none';
+            btn.disabled = true;
+            const originalBtnContent = btn.innerHTML;
+            btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;margin-right:8px;"></div>Running...';
+
+            try {
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+
+                const res = await fetch('/admin/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    if (data.type === 'select') {
+                        lastQueryResult = data;
+                        titleEl.innerHTML = `<span class="dot dot-green"></span>${data.row_count} Row(s) Returned`;
+                        actions.style.display = 'flex';
+                        document.getElementById('results-filter').value = '';
+
+                        if (data.row_count === 0) {
+                            container.innerHTML = `
+                                <div class="empty">
+                                    <div class="empty-icon blue">
+                                        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M8.5 11h5"/></svg>
+                                    </div>
+                                    Query executed successfully but returned 0 rows.
+                                </div>
+                            `;
+                        } else {
+                            // Render beautiful table
+                            let tableHtml = `
+                                <div class="table-wrap">
+                                <table class="data-table" id="query-results-table">
+                                    <thead>
+                                        <tr>
+                                            ${data.columns.map(col => `<th>${escapeHtml(col)}</th>`).join('')}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${data.rows.map(row => `
+                                            <tr>
+                                                ${data.columns.map(col => {
+                                                    const val = row[col];
+                                                    const dispVal = val === null ? '<span style="color:var(--text3);font-style:italic;">NULL</span>' : escapeHtml(String(val));
+                                                    return `<td>${dispVal}</td>`;
+                                                }).join('')}
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                                </div>
+                            `;
+                            container.innerHTML = tableHtml;
+                        }
+                    } else {
+                        // DML output
+                        titleEl.innerHTML = `<span class="dot dot-green"></span>Query Executed`;
+                        container.innerHTML = `
+                            <div class="alert-success">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                ${escapeHtml(data.message)}
+                            </div>
+                        `;
+                    }
+                } else {
+                    // Error message
+                    titleEl.innerHTML = `<span class="dot dot-red"></span>Execution Failed`;
+                    container.innerHTML = `
+                        <div class="alert-error">
+                            <div class="alert-error-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                Database Error
+                            </div>
+                            <div class="alert-error-msg">${escapeHtml(data.error)}</div>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                titleEl.innerHTML = `<span class="dot dot-red"></span>Network Error`;
+                container.innerHTML = `
+                    <div class="alert-error">
+                        <div class="alert-error-title">Network Request Failed</div>
+                        <div class="alert-error-msg">${escapeHtml(err.message)}</div>
+                    </div>
+                `;
+            } finally {
+                loader.style.display = 'none';
+                btn.disabled = false;
+                btn.innerHTML = originalBtnContent;
+            }
+        }
+
+        // Add Ctrl + Enter shortcut support in editor
+        document.getElementById('query-textarea')?.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                runCustomQuery();
+            }
+        });
+
+        // Filter returned rows locally
+        function filterResultsTable() {
+            const filterVal = document.getElementById('results-filter').value.toLowerCase().trim();
+            const table = document.getElementById('query-results-table');
+            if (!table) return;
+
+            const trs = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            for (let tr of trs) {
+                let match = false;
+                const tds = tr.getElementsByTagName('td');
+                for (let td of tds) {
+                    if (td.textContent.toLowerCase().includes(filterVal)) {
+                        match = true;
+                        break;
+                    }
+                }
+                tr.style.display = match ? '' : 'none';
+            }
+        }
+
+        // Export data function
+        function exportData(format) {
+            if (!lastQueryResult || !lastQueryResult.rows || lastQueryResult.rows.length === 0) return;
+
+            const cols = lastQueryResult.columns;
+            const rows = lastQueryResult.rows;
+            let fileContent = '';
+            let mimeType = '';
+            let fileName = `query_export_${new Date().getTime()}`;
+
+            if (format === 'csv') {
+                mimeType = 'text/csv;charset=utf-8;';
+                fileName += '.csv';
+                // Header row
+                fileContent += cols.map(c => `"${c.replace(/"/g, '""')}"`).join(',') + '\n';
+                // Data rows
+                rows.forEach(r => {
+                    fileContent += cols.map(colName => {
+                        const val = r[colName];
+                        const valStr = val === null ? '' : String(val);
+                        return `"${valStr.replace(/"/g, '""')}"`;
+                    }).join(',') + '\n';
+                });
+            } else if (format === 'json') {
+                mimeType = 'application/json;charset=utf-8;';
+                fileName += '.json';
+                fileContent = JSON.stringify(rows, null, 2);
+            }
+
+            const blob = new Blob([fileContent], { type: mimeType });
+            const link = document.createElement('a');
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', fileName);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        // ── Redis Cache Console Actions ──
+        async function loadRedisConsole() {
+            const statsContainer = document.getElementById('redis-stats-container');
+            const tableBody = document.getElementById('redis-keys-table-body');
+
+            statsContainer.innerHTML = `
+                <div style="grid-column: 1/-1; display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text2); padding:10px 0;">
+                    <div class="spinner" style="width:12px;height:12px;border-width:2px;"></div>
+                    <span>Loading Redis server metrics and cached keys...</span>
+                </div>
+            `;
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align:center;color:var(--text3);font-style:italic;padding:30px;">
+                        Querying Redis keyspace...
+                    </td>
+                </tr>
+            `;
+
+            try {
+                const res = await fetch('/admin/redis-status');
+                const data = await res.json();
+
+                if (data.success) {
+                    if (!data.connected) {
+                        // Redis offline
+                        statsContainer.innerHTML = `
+                            <div style="grid-column: 1/-1;" class="alert-error" style="margin: 0;">
+                                <div class="alert-error-title">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                    Redis Connectivity Failed
+                                </div>
+                                <div class="alert-error-msg">The Redis server is offline or unreachable on port 6379. Make sure Redis service is running locally.</div>
+                            </div>
+                        `;
+                        tableBody.innerHTML = `
+                            <tr>
+                                <td colspan="5" style="text-align:center;color:var(--red);padding:24px;">
+                                    Could not retrieve keys: Redis is offline.
+                                </td>
+                            </tr>
+                        `;
+                        return;
+                    }
+
+                    // Render Stats Cards
+                    const stats = data.server_info;
+                    statsContainer.innerHTML = `
+                        <div class="stat-card" style="padding:16px 20px;">
+                            <div class="stat-label" style="font-size:10px; margin-bottom:4px;">Redis Status</div>
+                            <div class="stat-value" style="font-size:20px; color:var(--green); display:flex; align-items:center; gap:6px;">
+                                <span class="dot dot-green" style="position:static; transform:none; width:8px; height:8px;"></span>
+                                Connected
+                            </div>
+                            <div class="stat-sub" style="margin-top:4px;">Version ${escapeHtml(stats.version)}</div>
+                        </div>
+                        <div class="stat-card" style="padding:16px 20px;">
+                            <div class="stat-label" style="font-size:10px; margin-bottom:4px;">Memory Usage</div>
+                            <div class="stat-value" style="font-size:20px; font-family:var(--mono);">${escapeHtml(stats.memory_used)}</div>
+                            <div class="stat-sub" style="margin-top:4px;">allocated RAM</div>
+                        </div>
+                        <div class="stat-card" style="padding:16px 20px;">
+                            <div class="stat-label" style="font-size:10px; margin-bottom:4px;">Clients</div>
+                            <div class="stat-value" style="font-size:20px; font-family:var(--mono);">${stats.connected_clients}</div>
+                            <div class="stat-sub" style="margin-top:4px;">active connections</div>
+                        </div>
+                        <div class="stat-card" style="padding:16px 20px;">
+                            <div class="stat-label" style="font-size:10px; margin-bottom:4px;">Server Uptime</div>
+                            <div class="stat-value" style="font-size:20px; font-family:var(--mono);">${stats.uptime_days} day(s)</div>
+                            <div class="stat-sub" style="margin-top:4px;">or ${stats.uptime_seconds.toLocaleString()}s</div>
+                        </div>
+                    `;
+
+                    // Render Keys Table
+                    const keys = data.keys;
+                    if (keys.length === 0) {
+                        tableBody.innerHTML = `
+                            <tr>
+                                <td colspan="5" style="text-align:center;color:var(--text3);font-style:italic;padding:40px;">
+                                    <div class="empty-icon" style="margin-bottom:12px;">
+                                        <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>
+                                    </div>
+                                    Redis keyspace is empty. No active sessions or rate limits cached.
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        let html = '';
+                        keys.forEach(k => {
+                            const ttlText = k.ttl === -1 ? '<span style="color:var(--text3);">No Expiry</span>' : k.ttl + 's';
+                            const keyLabelTypeClass = k.type === 'string' ? 'badge-blue' : 'badge-gold';
+                            html += `
+                                <tr>
+                                    <td style="font-family:var(--mono); font-size:11.5px; color:var(--text); font-weight:500;">
+                                        ${escapeHtml(k.key)}
+                                    </td>
+                                    <td>
+                                        <span class="badge ${keyLabelTypeClass}">${escapeHtml(k.type)}</span>
+                                    </td>
+                                    <td style="font-family:var(--mono); font-size:11px;">
+                                        ${ttlText}
+                                    </td>
+                                    <td style="font-family:var(--mono); font-size:10.5px; color:var(--text2); max-width: 400px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                        ${escapeHtml(k.value)}
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <button class="btn-secondary-outline" style="padding:2px 8px; font-size:10px; border-color:rgba(248,113,113,0.3); color:var(--red);" onclick="deleteRedisKey('${escapeHtml(k.key)}')">
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        tableBody.innerHTML = html;
+                    }
+                } else {
+                    statsContainer.innerHTML = `
+                        <div style="grid-column: 1/-1;" class="alert-error">
+                            <div class="alert-error-title">Failed to load Redis Status</div>
+                            <div class="alert-error-msg">${escapeHtml(data.error)}</div>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                statsContainer.innerHTML = `
+                    <div style="grid-column: 1/-1;" class="alert-error">
+                        <div class="alert-error-title">Network Request Error</div>
+                        <div class="alert-error-msg">${escapeHtml(err.message)}</div>
+                    </div>
+                `;
+            }
+        }
+
+        async function deleteRedisKey(keyName) {
+            if (!confirm(`Are you sure you want to delete cached key "${keyName}"?`)) return;
+
+            try {
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+
+                const res = await fetch('/admin/redis-action', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ action: 'delete', key: keyName })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    loadRedisConsole();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                alert('Network error: ' + err.message);
+            }
+        }
+
+        async function flushRedisCache() {
+            if (!confirm('WARNING: Are you sure you want to FLUSH the entire Redis database? This will clear all active sessions and reset all rate limits immediately.')) return;
+
+            try {
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+
+                const res = await fetch('/admin/redis-action', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ action: 'flush' })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    alert('Redis database flushed successfully!');
+                    loadRedisConsole();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                alert('Network error: ' + err.message);
+            }
+        }
+
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
     </script>
 </body>
 </html>

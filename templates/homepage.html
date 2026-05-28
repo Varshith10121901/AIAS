@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AIAS | AI As A Solution - Platform for Business Automation</title>
-  <link rel="icon" type="image/png" href="/static/images/logo.png">
+  <link rel="icon" type="image/svg+xml" href="/static/images/logo.svg"><link rel="icon" type="image/png" href="/static/images/logo.png">
   <meta name="description" content="AIAS is a B2B AI SaaS platform that helps teams deploy AI agents, automate workflows, and scale enterprise AI operations with real-time analytics." />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
   <style>
@@ -82,8 +82,7 @@
       justify-content: center;
       z-index: 9999;
       overflow: hidden;
-      transition: opacity 320ms ease, visibility 320ms ease;
-      perspective: 1200px;
+      transition: opacity 400ms ease, visibility 400ms ease;
     }
     .cinematic-intro::before {
       content: "";
@@ -114,9 +113,16 @@
       position: relative;
       z-index: 2;
       text-align: center;
-      transform-style: preserve-3d;
-      animation: floatStage 5.5s ease-in-out infinite;
       padding: 1rem;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: stageIn 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes stageIn {
+      from { opacity: 0; transform: scale(0.88) translateY(24px); }
+      to   { opacity: 1; transform: scale(1)   translateY(0); }
     }
     .aias-text {
       font-family: var(--serif);
@@ -131,8 +137,7 @@
       gap: 0;
       opacity: 0;
       transform: translateY(10px) scale(0.98);
-      text-shadow: none;
-      animation: introWordEase 560ms cubic-bezier(0.22, 1, 0.36, 1) forwards 120ms;
+      animation: introWordEase 560ms cubic-bezier(0.22, 1, 0.36, 1) forwards 300ms;
     }
     .aias-glow {
       margin-top: 0.45rem;
@@ -147,12 +152,12 @@
       align-items: center;
       gap: 0.1rem;
       width: max-content;
+      max-width: 90vw;
       margin-left: auto;
       margin-right: auto;
-      text-shadow: none;
       opacity: 0;
       transform: translateY(8px);
-      animation: introSubEase 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards 620ms;
+      animation: introSubEase 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards 800ms;
     }
     .aias-letter,
     .aias-sub-word {
@@ -255,6 +260,55 @@
       color: var(--ds-white);
       background: var(--ds-gold-deep);
       border-color: var(--ds-gold-deep);
+    }
+    .nav-welcome {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
+      color: var(--ds-black) !important;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      background: none !important;
+      border: none !important;
+      padding: 0 !important;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .nav-welcome:hover {
+      color: var(--ds-gold) !important;
+    }
+    .welcome-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 0.75rem;
+      background: var(--ds-soft);
+      border: 0.5px solid var(--ds-line);
+      border-radius: 4px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      padding: 1rem;
+      min-width: 220px;
+      z-index: 1000;
+      text-align: left;
+    }
+    .dropdown-link {
+      display: block;
+      color: var(--ds-muted);
+      font-size: 12px;
+      font-weight: 500;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: color 0.2s ease;
+      margin-top: 0.25rem;
+    }
+    .dropdown-link:hover {
+      color: var(--ds-black) !important;
     }
     .hero {
       padding-top: 4.2rem;
@@ -1365,13 +1419,43 @@
     .policy-modal.show,
     .account-modal.show { display: flex; }
 
+    body.modal-open {
+      overflow: hidden !important;
+      touch-action: none;
+    }
+
     .modal-card {
       width: min(560px, 96vw);
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
       background: var(--ds-white);
       border: 0.5px solid var(--ds-line);
       padding: 1.4rem;
       border-radius: 16px;
       animation: rise 280ms ease;
+    }
+
+    .policy-modal #policyBody,
+    .account-modal .modal-sub {
+      overflow-y: auto !important;
+      max-height: 60vh !important;
+      padding-right: 8px;
+    }
+
+    /* Sleek gold-themed scrollbar */
+    .policy-modal #policyBody::-webkit-scrollbar,
+    .account-modal .modal-sub::-webkit-scrollbar {
+      width: 5px;
+    }
+    .policy-modal #policyBody::-webkit-scrollbar-thumb,
+    .account-modal .modal-sub::-webkit-scrollbar-thumb {
+      background: var(--ds-gold-deep);
+      border-radius: 4px;
+    }
+    .policy-modal #policyBody::-webkit-scrollbar-track,
+    .account-modal .modal-sub::-webkit-scrollbar-track {
+      background: var(--ds-soft);
     }
     .modal-head {
       display: flex;
@@ -1504,140 +1588,51 @@
       font-size: 13px;
     }
     
-    html.theme-transition,
-    html.theme-transition *,
-    html.theme-transition *:before,
-    html.theme-transition *:after {
-      transition: background-color 700ms cubic-bezier(.4,0,.2,1),
-                  color 700ms cubic-bezier(.4,0,.2,1),
-                  border-color 700ms cubic-bezier(.4,0,.2,1),
-                  box-shadow 700ms cubic-bezier(.4,0,.2,1),
-                  background 700ms cubic-bezier(.4,0,.2,1),
-                  fill 700ms cubic-bezier(.4,0,.2,1),
-                  stroke 700ms cubic-bezier(.4,0,.2,1) !important;
-      transition-delay: 0s !important;
+    /* ── Smooth theme transition — direct property morphing, no flash overlay ── */
+    html.theme-transitioning,
+    html.theme-transitioning * {
+      transition:
+        background-color 500ms cubic-bezier(0.4, 0, 0.2, 1),
+        background       500ms cubic-bezier(0.4, 0, 0.2, 1),
+        color            500ms cubic-bezier(0.4, 0, 0.2, 1),
+        border-color     500ms cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow       500ms cubic-bezier(0.4, 0, 0.2, 1),
+        fill             500ms cubic-bezier(0.4, 0, 0.2, 1),
+        stroke           500ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    /* Suppress transition during page load */
+    html.no-transition, html.no-transition * {
+      transition: none !important;
     }
 
-    /* Crossfade overlay for seamless theme switch */
-    .theme-crossfade {
-      position: fixed;
-      inset: 0;
-      z-index: 999999;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 350ms cubic-bezier(.4,0,.2,1);
-      will-change: opacity;
-    }
-    .theme-crossfade.fade-in {
-      opacity: 1;
-    }
-
-    /* ── Premium 3D Pill Toggle ── */
-    .premium-toggle-wrap {
-      position: relative;
-      cursor: pointer;
-      margin-left: 1rem;
-      filter: drop-shadow(0 2px 8px rgba(212,175,55,0.12));
-      transition: filter 1s cubic-bezier(.4, 0, .2, 1);
+    /* ── Minimalist Rotating Sun/Moon Toggle ── */
+    .theme-icon-btn {
       background: none;
       border: none;
-      padding: 0;
-      outline: none;
-    }
-    .dark-theme .premium-toggle-wrap {
-      filter: drop-shadow(0 2px 10px rgba(212,175,55,0.18));
-    }
-    .light-theme .premium-toggle-wrap {
-      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.1));
-    }
-    .ptoggle-rim {
-      position: absolute;
-      inset: -3px;
-      border-radius: 28px;
-      pointer-events: none;
-      border: 1px solid transparent;
-      transition: box-shadow 1s cubic-bezier(.4, 0, .2, 1);
-    }
-    .dark-theme .ptoggle-rim {
-      box-shadow: 0 0 6px 1px rgba(212,175,55,0.15), inset 0 0 4px rgba(0,0,0,0.1);
-    }
-    .light-theme .ptoggle-rim {
-      box-shadow: 0 0 6px 1px rgba(0,0,0,0.08);
-    }
-    .ptoggle-track {
-      position: relative;
-      width: 76px;
-      height: 32px;
-      border-radius: 18px;
-      overflow: hidden;
-      transition: background 0.9s cubic-bezier(.4, 0, .2, 1), border-color 0.9s cubic-bezier(.4, 0, .2, 1);
-    }
-    .dark-theme .ptoggle-track {
-      background: #1a1a1c;
-      border: 2px solid #B88912;
-      box-shadow: inset 0 2px 6px rgba(0,0,0,0.4), inset 0 -1px 3px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.03);
-    }
-    .light-theme .ptoggle-track {
-      background: #ddd;
-      border: 2px solid #bbb;
-      box-shadow: inset 0 2px 6px rgba(0,0,0,0.12);
-    }
-    .ptoggle-shine {
-      position: absolute; top: 0; left: 0; right: 0; height: 40%;
-      border-radius: 18px 18px 60% 60%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%);
-      pointer-events: none;
-    }
-    .ptoggle-label {
-      position: absolute; top: 50%; transform: translateY(-50%);
-      font-family: var(--sans);
-      font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
-      pointer-events: none;
-      white-space: nowrap;
-      transition: opacity 0.6s cubic-bezier(.4, 0, .2, 1);
-    }
-    .ptoggle-label-dark {
-      right: 10px;
-      color: #c9a84c;
-      text-shadow: 0 0 4px rgba(212,175,55,0.2);
-    }
-    .ptoggle-label-light {
-      left: 10px;
-      color: #555;
-    }
-    .dark-theme .ptoggle-label-dark { opacity: 1; }
-    .dark-theme .ptoggle-label-light { opacity: 0; }
-    .light-theme .ptoggle-label-dark { opacity: 0; }
-    .light-theme .ptoggle-label-light { opacity: 1; }
-
-    .ptoggle-knob {
-      position: absolute;
-      top: 4px; left: 4px;
-      width: 22px; height: 22px;
+      cursor: pointer;
+      color: var(--ds-black);
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s ease;
+      margin-left: 1rem;
       border-radius: 50%;
-      z-index: 2;
-      transition: left 0.9s cubic-bezier(.4, 0, .2, 1), background 0.9s cubic-bezier(.4, 0, .2, 1), box-shadow 0.9s cubic-bezier(.4, 0, .2, 1);
+      border: 1px solid var(--ds-line);
     }
-    .dark-theme .ptoggle-knob {
-      left: 4px;
-      background: linear-gradient(145deg, #4a4a50, #2a2a2e, #1a1a1e);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
+    .theme-icon-btn:hover {
+      transform: rotate(30deg) scale(1.15);
+      color: var(--ds-gold-deep) !important;
+      border-color: var(--ds-gold-deep);
+      box-shadow: 0 0 10px rgba(212,175,55,0.2);
     }
-    .light-theme .ptoggle-knob {
-      left: calc(76px - 22px - 4px - 4px);
-      background: linear-gradient(145deg, #f0eeec, #d8d5d0, #c8c5c0);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.5);
+    html.light-theme {
+      --display-moon: block;
+      --display-sun: none;
     }
-    .ptoggle-specular {
-      position: absolute; top: 3px; left: 4px;
-      width: 14px; height: 8px; border-radius: 50%;
-      background: radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.2) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .ptoggle-knob-rim {
-      position: absolute; inset: 0; border-radius: 50%;
-      box-shadow: inset 0 -2px 3px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.1);
-      pointer-events: none;
+    html.dark-theme {
+      --display-moon: none;
+      --display-sun: block;
     }
     
     .signin-form button {
@@ -1695,9 +1690,114 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    /* ── Hamburger button ── */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      background: none;
+      border: 1px solid var(--ds-line);
+      border-radius: 6px;
+      padding: 8px 10px;
+      cursor: pointer;
+      color: var(--ds-black);
+      transition: border-color 0.2s, background 0.2s;
+      flex-shrink: 0;
+    }
+    .nav-hamburger:hover { border-color: var(--ds-gold-deep); background: rgba(212,175,55,0.06); }
+    .nav-hamburger span {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 2px;
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s;
+      transform-origin: center;
+    }
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── Mobile menu drawer ── */
+    .mobile-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--ds-white);
+      border-top: 0.5px solid var(--ds-line);
+      border-bottom: 0.5px solid var(--ds-line);
+      z-index: 8999;
+      flex-direction: column;
+      gap: 0;
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    .mobile-menu.open {
+      display: flex;
+      max-height: 600px;
+    }
+    .mobile-menu a, .mobile-menu .mobile-welcome {
+      display: block;
+      padding: 14px 20px;
+      font-size: 15px;
+      color: var(--ds-black);
+      text-decoration: none;
+      border-bottom: 0.5px solid var(--ds-line);
+      letter-spacing: 0.02em;
+      transition: background 0.15s, color 0.15s;
+    }
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-menu a:hover { background: rgba(212,175,55,0.07); color: var(--ds-gold-deep); }
+    .mobile-menu .mobile-signin {
+      margin: 12px 20px 16px;
+      background: var(--ds-black);
+      color: var(--ds-white) !important;
+      text-align: center;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-bottom: none !important;
+      padding: 12px 20px !important;
+    }
+    .mobile-menu .mobile-signin:hover { background: var(--ds-gold-deep) !important; color: #fff !important; }
+    .mobile-menu .mobile-theme-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-bottom: 0.5px solid var(--ds-line);
+    }
+    .mobile-menu .mobile-theme-label {
+      font-size: 14px;
+      color: var(--ds-muted);
+    }
+    .mobile-menu .mobile-signout {
+      color: #ff4d4d !important;
+    }
+
     @media (max-width: 980px) {
-      nav { flex-direction: column; align-items: flex-start; }
-      nav ul { justify-content: flex-start; }
+      nav {
+        position: relative !important;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 0.9rem;
+        padding-bottom: 0.9rem;
+        gap: 0;
+      }
+      nav > ul {
+        display: none !important;
+      }
+      .nav-hamburger {
+        display: flex;
+      }
       .hero-metric-row { grid-template-columns: 1fr 1fr; }
       .problem-grid,
       .feature-grid,
@@ -1723,6 +1823,46 @@
     }
 
     @media (max-width: 760px) {
+      /* Force reveal elements to be visible on mobile */
+      .reveal,
+      .problems,
+      .solutions,
+      .how-it-works,
+      .use-cases,
+      .live-demo,
+      .keywords-section,
+      .pricing,
+      .results,
+      .seo-block,
+      .cta-final,
+      footer,
+      .hero,
+      .tagline-band {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+      .reveal .problem-item,
+      .reveal .feature-card,
+      .reveal .how-card,
+      .reveal .use-card,
+      .reveal .demo-panel,
+      .reveal .price-card,
+      .reveal .result-metric,
+      .reveal .sales-card,
+      .reveal .testimonial,
+      .reveal .logo-pill,
+      .reveal.in-view .problem-item,
+      .reveal.in-view .feature-card,
+      .reveal.in-view .how-card,
+      .reveal.in-view .use-card,
+      .reveal.in-view .demo-panel,
+      .reveal.in-view .price-card {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+
       .site > nav,
       .site > .hero,
       .site > .tagline-band,
@@ -1787,8 +1927,7 @@
 </head>
 <body class="intro-lock">
   <div class="cinematic-intro" id="cinematicIntro" aria-label="AIAS cinematic intro">
-    <div class="animate__animated animate__flip" style="--animate-duration: 1.2s; animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);">
-      <div class="aias-stage">
+    <div class="aias-stage">
         <div class="aias-text" aria-label="AIAS">
         <span class="aias-letter gold-text" style="--i: 0;">A</span>
         <span class="aias-letter black-text" style="--i: 1;">I</span>
@@ -1809,44 +1948,116 @@
         </div>
       </div>
     </div>
-    </div>
     <button class="skip-intro" type="button" id="skipIntro">Skip Intro</button>
   </div>
 
   <div class="site" id="siteRoot">
-    <nav>
+    <nav id="mainNav">
       <div class="logo" style="display:flex;align-items:center;gap:10px;">
-        <img src="/static/images/logo.png" alt="AIAS Logo" style="height:32px;width:32px;object-fit:contain;border-radius:6px;box-shadow:0 2px 8px rgba(212,175,55,0.2);" />
+        <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0px 2px 8px rgba(212, 175, 55, 0.3)); flex-shrink: 0;">
+          <defs>
+            <linearGradient id="logoGold" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#F3E5AB" />
+              <stop offset="50%" stop-color="#D4AF37" />
+              <stop offset="100%" stop-color="#AA7C11" />
+            </linearGradient>
+          </defs>
+          <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" stroke="url(#logoGold)" stroke-width="7" fill="rgba(12, 12, 12, 0.95)" />
+          <path d="M50 22 L75 75 H61 L50 49 L39 75 H25 L50 22 Z" fill="url(#logoGold)" />
+          <path d="M43 60 H57" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
+        </svg>
         <span>AIAS <span>Platform</span></span>
       </div>
+
+      <!-- Desktop nav -->
       <ul>
         <li><a href="#features">Platform</a></li>
         <li><a href="#how-it-works">How It Works</a></li>
         <li><a href="#use-cases">Use Cases</a></li>
         <li><a href="#pricing">Pricing</a></li>
         {% if logged_in %}
-        <li><a href="#" id="navPrimaryCta" class="nav-cta" data-action="account" data-source="Top Nav Account">Welcome {{ user_name.split(' ')[0] }}</a></li>
-        {% if user_email == 'aiasprivateltd@gmail.com' or user_email == 'varshithkumar815@gmail.com' %}
-        <li><a href="/admin" class="nav-cta" style="background:var(--ds-gold-deep);color:#fff;padding:6px 14px;font-size:11px;letter-spacing:.06em;">Admin</a></li>
-        {% endif %}
+        <li style="position: relative; display: inline-block;">
+          <a href="#" id="navWelcomeBtn" class="nav-welcome" aria-expanded="false" style="text-decoration: none;">
+            <span>Welcome {{ user_name.split(' ')[0] }}</span>
+            <svg id="welcomeChevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s ease; display: inline-block; vertical-align: middle;">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </a>
+          <div id="navWelcomeDropdown" class="welcome-dropdown">
+            <div style="font-size: 11px; color: var(--ds-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Account Email</div>
+            <div style="font-size: 13px; color: var(--ds-black); word-break: break-all; font-family: var(--sans);">{{ user_email }}</div>
+            <div style="border-top: 0.5px solid var(--ds-line); margin: 0.75rem 0;"></div>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+              {% if user_email == 'aiasprivatelimited@gmail.com' or user_email == 'varshithkumar815@gmail.com' %}
+              <a href="/admin" class="dropdown-link" style="color: var(--ds-black);">Admin Console</a>
+              {% endif %}
+              <a href="/signout" class="dropdown-link" style="color: #ff4d4d;">Sign Out</a>
+            </div>
+          </div>
+        </li>
         {% else %}
         <li><a href="/signin" id="navPrimaryCta" class="nav-cta">Sign In</a></li>
         {% endif %}
         <li>
-          <button id="themeToggle" class="premium-toggle-wrap" aria-label="Toggle Theme" role="switch" tabindex="0">
-            <div class="ptoggle-rim"></div>
-            <div class="ptoggle-track">
-              <div class="ptoggle-shine"></div>
-              <span class="ptoggle-label ptoggle-label-dark">DARK</span>
-              <span class="ptoggle-label ptoggle-label-light">LIGHT</span>
-              <div class="ptoggle-knob">
-                <div class="ptoggle-specular"></div>
-                <div class="ptoggle-knob-rim"></div>
-              </div>
-            </div>
+          <button id="themeToggle" class="theme-icon-btn" aria-label="Toggle Theme">
+            <svg class="theme-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: var(--display-moon, block); transition: all 0.3s ease;">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <svg class="theme-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: var(--display-sun, none); transition: all 0.3s ease;">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
           </button>
         </li>
       </ul>
+
+      <!-- Mobile hamburger -->
+      <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <!-- Mobile slide-down menu -->
+      <div class="mobile-menu" id="mobileMenu" role="navigation" aria-label="Mobile navigation">
+        <a href="#features" class="mobile-link">Platform</a>
+        <a href="#how-it-works" class="mobile-link">How It Works</a>
+        <a href="#use-cases" class="mobile-link">Use Cases</a>
+        <a href="#pricing" class="mobile-link">Pricing</a>
+        <div class="mobile-theme-row">
+          <span class="mobile-theme-label">Toggle Theme</span>
+          <button id="themeToggleMobile" class="theme-icon-btn" aria-label="Toggle Theme" style="margin-left:0;">
+            <svg class="theme-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: var(--display-moon, block);">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <svg class="theme-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: var(--display-sun, none);">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+        </div>
+        {% if logged_in %}
+        <span class="mobile-welcome">👤 {{ user_name.split(' ')[0] }}  ·  {{ user_email }}</span>
+        {% if user_email == 'aiasprivatelimited@gmail.com' or user_email == 'varshithkumar815@gmail.com' %}
+        <a href="/admin" class="mobile-link">Admin Console</a>
+        {% endif %}
+        <a href="/signout" class="mobile-link mobile-signout">Sign Out</a>
+        {% else %}
+        <a href="/signin" class="mobile-signin">Sign In</a>
+        {% endif %}
+      </div>
     </nav>
 
     <section class="hero reveal" id="about">
@@ -1923,6 +2134,38 @@
           <h3 class="feature-name">Real-Time AI Analytics and ROI Tracking</h3>
           <p class="feature-benefit">Track execution volume, time saved, and business outcomes in one dashboard with real-time AI analytics.</p>
           <div class="feature-outcome">Outcome: Prove ROI quickly and optimize automation strategy</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="solutions reveal" id="founder-engine" style="background: linear-gradient(180deg, var(--ds-soft) 0%, rgba(212,175,55,0.05) 50%, var(--ds-soft) 100%); border-bottom: 0.5px solid var(--ds-line); padding-top: 3.5rem; padding-bottom: 3.5rem;">
+      <div class="section-tag" style="background: var(--ds-gold-deep); color: #fff; border: none; padding: 4px 10px; font-weight: 600;">AIAS 2.0 FOR FOUNDERS</div>
+      <h2 class="section-title">The Massive Leap from Operations to Product Delivery</h2>
+      <p class="section-copy">Startup founders need proprietary technology assets, not vendor lock-in. AIAS 2.0 compiles native frontends, automates compliance, and exports standard, clean code that you can host anywhere or show to VC investors.</p>
+      
+      <div class="feature-grid">
+        <article class="feature-card" style="position: relative; overflow: hidden; border-left: 3px solid var(--ds-gold-deep);">
+          <h3 class="feature-name">1. True Code Exportability (Zero Lock-In)</h3>
+          <p class="feature-benefit">Outgrown the platform? Click "Eject" to download your workflows compiled as a standardized, beautifully clean Python or Node.js backend with Docker container configurations. Completely independent, ready to deploy to AWS or Google Cloud.</p>
+          <div class="feature-outcome" style="background: rgba(212,175,55,0.1); border-color: var(--ds-gold-deep); color: var(--ds-gold-deep);">100% OWNERSHIP &middot; NO LOCK-IN</div>
+        </article>
+
+        <article class="feature-card" style="position: relative; overflow: hidden; border-left: 3px solid var(--ds-gold-deep);">
+          <h3 class="feature-name">2. Native Frontend Compilation Engine</h3>
+          <p class="feature-benefit">We don't just mock apps—our engine automatically compiles production-ready mobile code frameworks in React Native or Flutter. Access smartphone hardware natively, including background GPS tracking, native camera processing, and encrypted local storage.</p>
+          <div class="feature-outcome" style="background: rgba(212,175,55,0.1); border-color: var(--ds-gold-deep); color: var(--ds-gold-deep);">FLUTTER &amp; REACT NATIVE &middot; NATIVE SDK</div>
+        </article>
+
+        <article class="feature-card" style="position: relative; overflow: hidden; border-left: 3px solid var(--ds-gold-deep);">
+          <h3 class="feature-name">3. App Store Compliance &amp; CI/CD Pipelines</h3>
+          <p class="feature-benefit">Skip the manual submission headache. AIAS auto-generates your App Store privacy policies, runs data tracking compliance checks, orchestrates TestFlight &amp; Google Play Console beta builds, and deploys storefront updates automatically.</p>
+          <div class="feature-outcome" style="background: rgba(212,175,55,0.1); border-color: var(--ds-gold-deep); color: var(--ds-gold-deep);">AUTOMATED COMPLIANCE &middot; CI/CD PIPELINE</div>
+        </article>
+
+        <article class="feature-card" style="position: relative; overflow: hidden; border-left: 3px solid var(--ds-gold-deep);">
+          <h3 class="feature-name">4. Secure Custom Code Sandbox</h3>
+          <p class="feature-benefit">Need custom logic for deep-tech sectors? Inject raw Python, Go, or C++ scripts directly into your automation pipelines. Process complex mathematics, real-time spatial databases, telemetry streams, and hardware telemetry without template restrictions.</p>
+          <div class="feature-outcome" style="background: rgba(212,175,55,0.1); border-color: var(--ds-gold-deep); color: var(--ds-gold-deep);">SECURE CODE SANDBOX &middot; RAW TELEMETRY &amp; GIS</div>
         </article>
       </div>
     </section>
@@ -2188,7 +2431,7 @@
       <div class="footer-links">
         <a data-action="policy" data-policy="privacy">Privacy</a>
         <a data-action="policy" data-policy="terms">Terms</a>
-        <a href="/signin">Contact</a>
+        <a data-action="policy" data-policy="contact" style="cursor: pointer;">Contact</a>
         <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" data-track="LinkedIn Click">LinkedIn</a>
       </div>
     </footer>
@@ -2245,7 +2488,12 @@
     <div class="modal-card">
       <div class="modal-head">
         <h3 class="modal-title" id="policyTitle">Policy</h3>
-        <button class="modal-close" type="button" data-close="policy">X</button>
+        <button class="modal-close" type="button" data-close="policy" style="display:flex; align-items:center; justify-content:center; padding:0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
       <p class="modal-sub" id="policyBody"></p>
     </div>
@@ -2256,7 +2504,12 @@
     <div class="modal-card">
       <div class="modal-head">
         <h3 class="modal-title">Your AIAS Account</h3>
-        <button class="modal-close" type="button" data-close="account">X</button>
+        <button class="modal-close" type="button" data-close="account" style="display:flex; align-items:center; justify-content:center; padding:0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
       <p class="modal-sub">You are signed in. Continue browsing or sign out.</p>
       <div class="account-details">
@@ -2282,7 +2535,8 @@
   <!-- AIAS Runtime Config (used by chatbot.js) -->
   <script>
     window.AIAS_CONFIG = {
-      isLoggedIn: {{ 'true' if logged_in else 'false' }}
+      isLoggedIn: {{ 'true' if logged_in else 'false' }},
+      userEmail: "{{ user_email if user_email else '' }}"
     };
   </script>
 
@@ -2312,8 +2566,59 @@
       const IS_LOGGED_IN = {{ 'true' if logged_in else 'false' }};
 
       const policyText = {
-        privacy: "AIAS stores form details in local browser storage after submission and keeps cookie preference settings to avoid repeated sign-in prompts on the same device.",
-        terms: "This page is a product preview experience. Demo submissions are stored locally in your browser. You can integrate these events with your backend CRM or automation API."
+        privacy: `
+          <div style="font-family: var(--sans); color: var(--ds-black); line-height: 1.6; text-align: left;">
+            <p style="margin-bottom: 1rem; font-weight: 600; color: var(--ds-gold-deep); font-size: 15px; display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ds-black)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>AIAS Founder &amp; Enterprise Data Protection Safeguards</span>
+            </p>
+            <p style="margin-bottom: 0.8rem; font-size: 13px;">We understand that your business data and proprietary workflows are your most valuable intellectual assets. AIAS enforces military-grade protocols to guarantee complete security and safety:</p>
+            <ul style="padding-left: 1.2rem; margin-bottom: 1rem; font-size: 12.5px; display: flex; flex-direction: column; gap: 0.5rem;">
+              <li><strong>End-to-End Encryption:</strong> All sensitive data is secured with AES-256 encryption at rest (Azure SQL Server Transparent Data Encryption) and TLS 1.3 in transit.</li>
+              <li><strong>Zero-Trust Sandboxing:</strong> Custom Python, Go, and C++ pipeline code scripts run inside secure, multi-tenant isolated docker sandboxes, ensuring zero cross-leakage of telemetry or spatial streams.</li>
+              <li><strong>Data Sovereignty:</strong> AIAS does not train public foundation models on your customer datasets, specialized spatial databases, or operational workflows.</li>
+              <li><strong>Regulatory Compliance:</strong> Engineered to align strictly with SOC2 Type II, GDPR, and HIPAA data compliance boundaries.</li>
+              <li><strong>Zero Permanent Logs:</strong> Temporary execution telemetry is automatically purged after 2 hours.</li>
+            </ul>
+            <p style="font-size: 11.5px; color: var(--ds-muted);">Your trust is our ultimate benchmark. If you decide to eject and export your codebase, your database connections are instantly wiped from our active caches.</p>
+          </div>
+        `,
+        terms: `
+          <div style="font-family: var(--sans); color: var(--ds-black); line-height: 1.6; text-align: left;">
+            <p style="margin-bottom: 1rem; font-weight: 600; color: var(--ds-gold-deep); font-size: 15px; display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ds-black)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span>Terms of Service &amp; Intellectual Property Sovereignty</span>
+            </p>
+            <p style="margin-bottom: 0.8rem; font-size: 13px;">AIAS 2.0 is built from the ground up to empower startup founders. Our Terms of Service explicitly protect your ownership rights:</p>
+            <ul style="padding-left: 1.2rem; margin-bottom: 1rem; font-size: 12.5px; display: flex; flex-direction: column; gap: 0.5rem;">
+              <li><strong>100% IP Ownership:</strong> Unlike other low-code platforms, you retain complete, unencumbered ownership of all generated workflows, compiled Flutter/React Native frontends, and exported standalone code.</li>
+              <li><strong>Unconditional Export (Eject):</strong> You have the absolute legal and technical right to click 'Eject/Export' at any time. AIAS will compile your platform assets into raw, standard developer Docker containers that you can host independently on AWS, GCP, or bare metal.</li>
+              <li><strong>Sandbox Terms of Use:</strong> Users are prohibited from executing malicious, destructive, or reverse-engineering scripts inside the custom sandboxes.</li>
+              <li><strong>Platform SLA Guarantee:</strong> We maintain a target uptime of 99.95%. Custom integrations and database channels are fully monitored and isolated to protect performance benchmarks.</li>
+            </ul>
+            <p style="font-size: 11.5px; color: var(--ds-muted);">AIAS is your production build partner—not a vendor lock-in engine. Run on our cloud, or take the keys and run independently.</p>
+          </div>
+        `,
+        contact: `
+          <div style="font-family: var(--sans); color: var(--ds-black); line-height: 1.6; text-align: left;">
+            <p style="margin-bottom: 1.25rem; font-weight: 600; color: var(--ds-gold-deep); font-size: 15px; display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ds-black)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <span>Contact AIAS Support &amp; Sales</span>
+            </p>
+            <p style="margin-bottom: 1.5rem; font-size: 13.5px;">If you have any questions, concerns, or inquiries regarding our platform, custom enterprise integrations, or scheduling, please reach out to us directly:</p>
+            <div style="background-color: var(--ds-soft); border: 0.5px solid var(--ds-line); border-radius: 6px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ds-black)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <span style="font-size: 14px; font-weight: 500; font-family: var(--sans);"><a href="mailto:aiasprivatelimited@gmail.com" style="color: var(--ds-black); text-decoration: none;">aiasprivatelimited@gmail.com</a></span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ds-black)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <span style="font-size: 14px; font-weight: 500; font-family: var(--sans); color: var(--ds-black);">+91 7022756962</span>
+              </div>
+            </div>
+            <p style="font-size: 11.5px; color: var(--ds-muted);">Our team is available 24/7 and will respond to your email or WhatsApp message within 24 hours.</p>
+          </div>
+        `
       };
 
       const consentCookie = "aias_cookie_consent";
@@ -2552,6 +2857,7 @@
       // ── Account Modal ──
       function openAccountModal(source) {
         if (!accountModal) return;
+        document.body.classList.add("modal-open");
         accountModal.classList.add("show");
         accountModal.setAttribute("aria-hidden", "false");
         saveEvent("open_account", source || "unknown", {});
@@ -2559,20 +2865,27 @@
 
       function closeAccountModal() {
         if (!accountModal) return;
+        document.body.classList.remove("modal-open");
         accountModal.classList.remove("show");
         accountModal.setAttribute("aria-hidden", "true");
       }
 
-      // ── Policy Modal ──
       function openPolicy(policyKey) {
-        policyTitle.textContent = policyKey === "privacy" ? "Privacy" : "Terms";
-        policyBody.textContent = policyText[policyKey] || "Policy content not available.";
+        const titleMap = {
+          privacy: "Privacy Policy",
+          terms: "Terms of Service",
+          contact: "Contact Details"
+        };
+        policyTitle.textContent = titleMap[policyKey] || "Policy";
+        policyBody.innerHTML = policyText[policyKey] || "Policy content not available.";
+        document.body.classList.add("modal-open");
         policyModal.classList.add("show");
         policyModal.setAttribute("aria-hidden", "false");
         saveEvent("open_policy", policyKey, {});
       }
 
       function closePolicy() {
+        document.body.classList.remove("modal-open");
         policyModal.classList.remove("show");
         policyModal.setAttribute("aria-hidden", "true");
       }
@@ -2766,9 +3079,83 @@
             }
           });
         },
-        { threshold: 0.14 }
+        { threshold: 0.02 }
       );
       revealEls.forEach(el => observer.observe(el));
+
+      // ── Mobile Hamburger Toggle ──
+      const hamburger = document.getElementById("navHamburger");
+      const mobileMenu = document.getElementById("mobileMenu");
+      if (hamburger && mobileMenu) {
+        hamburger.addEventListener("click", function (e) {
+          e.stopPropagation();
+          const isOpen = mobileMenu.classList.contains("open");
+          if (isOpen) {
+            mobileMenu.classList.remove("open");
+            hamburger.classList.remove("open");
+            hamburger.setAttribute("aria-expanded", "false");
+          } else {
+            mobileMenu.classList.add("open");
+            hamburger.classList.add("open");
+            hamburger.setAttribute("aria-expanded", "true");
+          }
+        });
+        // Close menu when any mobile link is tapped
+        mobileMenu.querySelectorAll("a").forEach(function(link) {
+          link.addEventListener("click", function() {
+            mobileMenu.classList.remove("open");
+            hamburger.classList.remove("open");
+            hamburger.setAttribute("aria-expanded", "false");
+          });
+        });
+        // Close menu when clicking outside
+        document.addEventListener("click", function(e) {
+          if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+            mobileMenu.classList.remove("open");
+            hamburger.classList.remove("open");
+            hamburger.setAttribute("aria-expanded", "false");
+          }
+        });
+      }
+
+      // ── Mobile theme toggle mirrors desktop ──
+      const themeToggleMobile = document.getElementById("themeToggleMobile");
+      const themeToggleDesktop = document.getElementById("themeToggle");
+      if (themeToggleMobile && themeToggleDesktop) {
+        themeToggleMobile.addEventListener("click", function() {
+          themeToggleDesktop.click();
+        });
+      }
+
+      // ── Welcome Dropdown Toggle ──
+      const welcomeBtn = document.getElementById("navWelcomeBtn");
+      const welcomeDropdown = document.getElementById("navWelcomeDropdown");
+      const welcomeChevron = document.getElementById("welcomeChevron");
+
+      if (welcomeBtn && welcomeDropdown) {
+        welcomeBtn.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          const isOpen = welcomeDropdown.style.display === "block";
+          if (isOpen) {
+            welcomeDropdown.style.display = "none";
+            if (welcomeChevron) welcomeChevron.style.transform = "rotate(0deg)";
+            welcomeBtn.setAttribute("aria-expanded", "false");
+          } else {
+            welcomeDropdown.style.display = "block";
+            if (welcomeChevron) welcomeChevron.style.transform = "rotate(180deg)";
+            welcomeBtn.setAttribute("aria-expanded", "true");
+          }
+        });
+
+        document.addEventListener("click", function (event) {
+          if (!welcomeDropdown.contains(event.target) && event.target !== welcomeBtn) {
+            welcomeDropdown.style.display = "none";
+            if (welcomeChevron) welcomeChevron.style.transform = "rotate(0deg)";
+            welcomeBtn.setAttribute("aria-expanded", "false");
+          }
+        });
+      }
 
       // ── Escape Key ──
       window.addEventListener("keydown", function (event) {
@@ -2795,12 +3182,14 @@
   <div class="theme-crossfade" id="themeCrossfade"></div>
 
   <script>
-    // Theme toggler with crossfade overlay
+    // ── Smooth theme toggle — no flash, pure CSS property transitions ──
     const themeToggle = document.getElementById('themeToggle');
-    const themeCrossfade = document.getElementById('themeCrossfade');
-    let themeTransitioning = false;
 
-    function setTheme(isDark) {
+    function setTheme(isDark, instant) {
+      if (instant) {
+        // Suppress all transitions during page-load apply
+        document.documentElement.classList.add('no-transition');
+      }
       if (isDark) {
         document.documentElement.classList.add('dark-theme');
         document.documentElement.classList.remove('light-theme');
@@ -2810,46 +3199,33 @@
         document.documentElement.classList.remove('dark-theme');
         localStorage.setItem('theme', 'light');
       }
+      if (instant) {
+        // Re-enable transitions after a single paint frame
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            document.documentElement.classList.remove('no-transition');
+          });
+        });
+      }
     }
 
+    // Apply saved theme instantly on load (no transition flash)
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      setTheme(true);
+      setTheme(true, true);
     } else {
-      setTheme(false);
+      setTheme(false, true);
     }
 
+    // User clicks → smooth animated transition
     themeToggle.addEventListener('click', () => {
-      if (themeTransitioning) return;
-      themeTransitioning = true;
-
+      document.documentElement.classList.add('theme-transitioning');
       const goingDark = document.documentElement.classList.contains('light-theme');
-
-      // Set overlay color to destination theme bg
-      themeCrossfade.style.background = goingDark ? '#0c0c0c' : '#f5f5f0';
-
-      // Phase 1: Fade overlay in (hides the page)
-      requestAnimationFrame(() => {
-        themeCrossfade.classList.add('fade-in');
-      });
-
-      // Phase 2: At peak opacity, swap theme classes
+      setTheme(goingDark, false);
+      themeToggle.setAttribute('aria-checked', goingDark);
       setTimeout(() => {
-        document.documentElement.classList.add('theme-transition');
-        setTheme(goingDark);
-        themeToggle.setAttribute('aria-checked', goingDark);
-
-        // Phase 3: Fade overlay back out (reveals new theme)
-        requestAnimationFrame(() => {
-          themeCrossfade.classList.remove('fade-in');
-        });
-
-        // Phase 4: Clean up transition class after properties settle
-        setTimeout(() => {
-          document.documentElement.classList.remove('theme-transition');
-          themeTransitioning = false;
-        }, 750);
-      }, 350);
+        document.documentElement.classList.remove('theme-transitioning');
+      }, 550);
     });
   </script>
 </body>
