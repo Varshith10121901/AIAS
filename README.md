@@ -345,6 +345,8 @@ http://127.0.0.1:5000
 
 ## Deployment Commands
 
+### Option 1: Docker Compose (Recommended)
+
 Build and start:
 
 ```bash
@@ -360,7 +362,8 @@ docker compose ps
 View logs:
 
 ```bash
-docker compose logs --tail=120
+docker compose logs --tail=120 aias-web
+docker compose logs --tail=120 aias-redis
 ```
 
 Stop stack:
@@ -368,6 +371,36 @@ Stop stack:
 ```bash
 docker compose down
 ```
+
+### Option 2: Standalone Docker CLI (Without Compose)
+
+If you wish to deploy the containers manually using the `docker` CLI instead of `docker-compose`, use one of the following setups:
+
+#### Setup A: Using a Shared Network (Recommended)
+1. Create the bridge network:
+   ```bash
+   docker network create aias-network
+   ```
+2. Start the Redis container (named `aias-redis`):
+   ```bash
+   docker run -d --name aias-redis --network aias-network redis:7-alpine
+   ```
+3. Start the Web App container (named `aias-platform`):
+   ```bash
+   docker run -d --name aias-platform --network aias-network -p 5000:5000 --env-file .env -e REDIS_URL=redis://aias-redis:6379/0 aias-aias-web:latest
+   ```
+
+#### Setup B: Using Host Port Mapping
+1. Start the Redis container:
+   ```bash
+   docker run -d --name aias-redis -p 6379:6379 redis:7-alpine
+   ```
+2. Start the Web App container pointing to your host's Redis loopback:
+   ```bash
+   docker run -d --name aias-platform -p 5000:5000 --env-file .env -e REDIS_URL=redis://host.docker.internal:6379/0 aias-aias-web:latest
+   ```
+
+---
 
 ## Smoke Test Checklist
 

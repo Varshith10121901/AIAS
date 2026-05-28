@@ -672,6 +672,8 @@ Never commit `.env`.
 
 ## 18. Deployment Commands
 
+### Option 1: Docker Compose (Recommended)
+
 Build and start:
 
 ```bash
@@ -702,6 +704,36 @@ Stop and delete Redis volume:
 ```bash
 docker compose down -v
 ```
+
+### Option 2: Standalone Docker CLI (Without Compose)
+
+To run the containers individually using the `docker` command line:
+
+#### Setup A: Shared Network Bridge
+1. Create bridge network:
+   ```bash
+   docker network create aias-network
+   ```
+2. Run Redis container (name: `aias-redis`):
+   ```bash
+   docker run -d --name aias-redis --network aias-network redis:7-alpine
+   ```
+3. Run Web container (name: `aias-platform`):
+   ```bash
+   docker run -d --name aias-platform --network aias-network -p 5000:5000 --env-file .env -e REDIS_URL=redis://aias-redis:6379/0 aias-aias-web:latest
+   ```
+
+#### Setup B: Host Loopback Mapping
+1. Run Redis container:
+   ```bash
+   docker run -d --name aias-redis -p 6379:6379 redis:7-alpine
+   ```
+2. Run Web container:
+   ```bash
+   docker run -d --name aias-platform -p 5000:5000 --env-file .env -e REDIS_URL=redis://host.docker.internal:6379/0 aias-aias-web:latest
+   ```
+
+---
 
 ## 19. Deployment Smoke Test Checklist
 
