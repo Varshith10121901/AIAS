@@ -59,7 +59,7 @@ class Config:
 
     # ── Redis Reliability ──
     REDIS_MAX_CONNECTIONS = int(os.getenv("REDIS_MAX_CONNECTIONS", "20"))
-    REDIS_SOCKET_TIMEOUT = int(os.getenv("REDIS_SOCKET_TIMEOUT", "3"))
+    REDIS_SOCKET_TIMEOUT = int(os.getenv("REDIS_SOCKET_TIMEOUT", "1"))
     REDIS_CIRCUIT_BREAKER_COOLDOWN = int(os.getenv("REDIS_CIRCUIT_BREAKER_COOLDOWN", "30"))
 
     # Session

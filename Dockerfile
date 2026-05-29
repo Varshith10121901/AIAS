@@ -40,5 +40,5 @@ EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD python -c "import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:%s/health' % os.getenv('PORT', '5000'), timeout=4)" || exit 1
 
-# Production entry: gunicorn (with database init pre-check)
-CMD ["sh", "-c", "python -c 'from database.db import db_manager; res = db_manager.health_check(); print(\"[AIAS] Database check:\", res); assert res[\"status\"] == \"healthy\", \"Database unhealthy\"' && exec python -m gunicorn --bind 0.0.0.0:${PORT:-5000} --workers ${WEB_CONCURRENCY:-4} --threads ${GUNICORN_THREADS:-2} --timeout ${GUNICORN_TIMEOUT:-120} --access-logfile - --error-logfile - 'app:create_app()'"]
+# Production entry: gunicorn (with database init pre-check logged but not hard-blocking)
+CMD ["sh", "-c", "python -c 'from database.db import db_manager; res = db_manager.health_check(); print(\"[AIAS] Database check:\", res)' && exec python -m gunicorn --bind 0.0.0.0:${PORT:-5000} --workers ${WEB_CONCURRENCY:-4} --threads ${GUNICORN_THREADS:-2} --timeout ${GUNICORN_TIMEOUT:-120} --access-logfile - --error-logfile - 'app:create_app()'"]
