@@ -29,10 +29,9 @@ def create_app():
     # ── Configuration ──
     app.config["SECRET_KEY"] = Config.SECRET_KEY
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=Config.SESSION_LIFETIME_HOURS)
-    app.config["SESSION_COOKIE_HTTPONLY"] = True
-    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-    if Config.FLASK_ENV != "development":
-        app.config["SESSION_COOKIE_SECURE"] = True
+    app.config["SESSION_COOKIE_HTTPONLY"] = Config.SESSION_COOKIE_HTTPONLY
+    app.config["SESSION_COOKIE_SAMESITE"] = Config.SESSION_COOKIE_SAMESITE
+    app.config["SESSION_COOKIE_SECURE"] = Config.SESSION_COOKIE_SECURE
     app.config["WTF_CSRF_TIME_LIMIT"] = 3600  # 1 hour CSRF token validity
 
     # ── Security: CSRF Protection ──
