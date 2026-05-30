@@ -1,8 +1,3 @@
-"""
-AIAS Database Connection Manager for MongoDB
-Provides connection pooling, auto-indexing, health checks, and query helpers.
-"""
-
 import logging
 import threading
 import time
