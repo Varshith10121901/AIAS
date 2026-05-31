@@ -1,3 +1,8 @@
+"""
+AIAS Database Models for MongoDB
+Provides data access methods for Users, OTPs, and Sessions.
+"""
+
 from datetime import datetime, timedelta, timezone
 from bson import ObjectId
 

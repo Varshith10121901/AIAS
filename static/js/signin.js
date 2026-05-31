@@ -1,3 +1,8 @@
+/**
+ * AIAS Sign-In System — Frontend Logic
+ * Handles form submissions, OTP input, toasts, and password strength.
+ */
+
 // ── Toast Notification System ──
 class ToastManager {
     constructor() {

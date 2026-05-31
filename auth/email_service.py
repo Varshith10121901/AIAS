@@ -1,3 +1,9 @@
+"""
+AIAS Email Service
+Sends OTP verification emails via Gmail SMTP over TLS.
+Uses HTML templates for professional email appearance.
+"""
+
 import smtplib
 import ssl
 from email.mime.text import MIMEText

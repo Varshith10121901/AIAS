@@ -1,3 +1,8 @@
+"""
+AIAS Google OAuth 2.0
+Handles 'Sign in with Google' using authlib.
+"""
+
 from authlib.integrations.flask_client import OAuth
 
 from config import Config
