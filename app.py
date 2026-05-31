@@ -1,3 +1,8 @@
+"""
+AIAS — Main Flask Application
+Entry point for the Sign-In & Verification System.
+"""
+
 import logging
 import os
 import sys

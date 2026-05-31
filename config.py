@@ -1,3 +1,8 @@
+"""
+AIAS Configuration Module
+Loads environment variables and provides app-wide settings.
+"""
+
 import os
 import secrets
 from dotenv import load_dotenv

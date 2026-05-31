@@ -1,3 +1,8 @@
+"""
+AIAS Auth Routes
+All authentication endpoints: sign-in, register, OTP verification, Google OAuth.
+"""
+
 import secrets
 from functools import wraps
 

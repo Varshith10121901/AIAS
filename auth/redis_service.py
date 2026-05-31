@@ -1,3 +1,12 @@
+"""
+AIAS Redis Service
+Handles Redis connection management, session caching, and rate limiting
+with circuit breaker pattern for automatic recovery.
+
+Connection Type: redis-py → ConnectionPool → TCP to Redis server
+Protocol: RESP (Redis Serialization Protocol)
+"""
+
 import json
 import logging
 import threading

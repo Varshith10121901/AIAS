@@ -1,3 +1,9 @@
+"""
+AIAS Rate Limiter
+Prevents brute force attacks, email spam, and abuse.
+Uses database-backed sliding window rate limiting.
+"""
+
 from database.security import DatabaseSecurity
 from config import Config
 
