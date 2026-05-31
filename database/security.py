@@ -1,9 +1,3 @@
-"""
-AIAS Database Security Utilities for MongoDB
-Handles expired data cleanup, rate limit log management,
-and database integrity checks.
-"""
-
 from datetime import datetime, timedelta, timezone
 
 from database.db import db
