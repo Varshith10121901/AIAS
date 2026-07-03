@@ -361,6 +361,39 @@ function initResetPasswordForm() {
     });
 }
 
+// ── Google loading animation ──
+function initGoogleLoading() {
+    const googleBtns = document.querySelectorAll('#google-signin-btn, #google-signup-btn');
+    googleBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            // Check for modifier keys (Ctrl, Cmd, Shift, Alt) or middle click
+            if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) {
+                return;
+            }
+            if (btn.classList.contains('loading')) {
+                e.preventDefault();
+                return;
+            }
+            btn.classList.add('loading');
+            
+            const href = btn.getAttribute('href');
+            if (href) {
+                e.preventDefault();
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 450);
+            }
+        });
+    });
+
+    // Clear all loading states if user navigates back or pages are restored from cache
+    window.addEventListener('pageshow', (event) => {
+        document.querySelectorAll('.loading').forEach(el => {
+            el.classList.remove('loading');
+        });
+    });
+}
+
 // ── Initialize Everything ──
 document.addEventListener('DOMContentLoaded', () => {
     initSigninForm();
@@ -371,6 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initOTPInputs();
     initOTPForm();
     initResendOTP();
+    initGoogleLoading();
 
     // Flash messages from server
     document.querySelectorAll('.flash-message').forEach(el => {

@@ -1,5 +1,11 @@
 # AIAS
 
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-3.1.1-000000?style=flat-square&logo=flask&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=flat-square&logo=mongodb&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-5.0-DC382D?style=flat-square&logo=redis&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=flat-square&logo=docker&logoColor=white)
+
 AIAS is a Flask-based business website and lead management platform. It provides a public website, secure user authentication, an Aria chatbot for lead capture, booking workflows, admin operations, MongoDB Atlas database persistence, Redis caching, email notifications, Zoom meeting support, and Docker-based deployment.
 
 ## Project Summary

@@ -56,3 +56,6 @@ nul
 
 # One-off local maintenance scripts
 fix_db.py
+
+# Secure certificates/private keys
+*.pem

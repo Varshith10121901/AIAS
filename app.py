@@ -125,7 +125,7 @@ def create_app():
         )
 
     # ── Admin Dashboard ──
-    ADMIN_EMAILS = {"aiasprivatelimited@gmail.com", "varshithkumar815@gmail.com"}
+    ADMIN_EMAILS = {"aiasprivateltd@gmail.com", "varshithkumar815@gmail.com"}
 
     @app.route("/admin")
     def admin_dashboard():

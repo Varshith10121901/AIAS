@@ -7,12 +7,7 @@
     </linearGradient>
   </defs>
   <!-- Hexagon border -->
-  <polygon
-    points="50,5 90,28 90,72 50,95 10,72 10,28"
-    stroke="url(#logoGold)"
-    stroke-width="7"
-    fill="rgba(12,12,12,0.95)"
-  />
+  <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" stroke="url(#logoGold)" stroke-width="7" fill="rgba(12, 12, 12, 0.95)"></polygon>
   <!-- A-mark -->
   <path
     d="M50 22 L75 75 H61 L50 49 L39 75 H25 L50 22 Z"

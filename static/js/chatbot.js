@@ -1,7 +1,7 @@
 /* AIAS Aria Chatbot — Full Lead Qualification */
 (function(){
 const CFG={
-  email:"aiasprivatelimited@gmail.com",
+  email:"aiasprivateltd@gmail.com",
   phone:"+91 7022756962",
   calendly:"https://calendly.com/aiasprivateltd",
   supportEmail:"support@aias.in",

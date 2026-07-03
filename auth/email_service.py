@@ -294,7 +294,7 @@ class EmailService:
         if not Config.MAIL_USERNAME or not Config.MAIL_PASSWORD:
             return {"success": False, "error": "Email service not configured."}
 
-        TEAM_EMAIL = "aiasprivatelimited@gmail.com"
+        TEAM_EMAIL = "aiasprivateltd@gmail.com"
 
         # Build recipients list
         recipients = [TEAM_EMAIL]

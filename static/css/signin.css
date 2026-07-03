@@ -139,9 +139,69 @@ body {
     color: var(--text-primary); font-family: inherit; font-size: 14px; font-weight: 500;
     cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
     transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
 }
 .btn-google:hover { background: var(--bg-input); transform: translateY(-1px); border-color: #d1d1d1; }
-.btn-google svg { width: 18px; height: 18px; }
+.btn-google svg { width: 18px; height: 18px; transition: opacity var(--transition-fast); }
+
+/* Stylish Google Loading State */
+.btn-google.loading {
+    pointer-events: none;
+    color: transparent !important;
+}
+.btn-google.loading svg {
+    opacity: 0;
+}
+.btn-google.loading::before {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid rgba(0, 0, 0, 0.05);
+    border-top: 2.5px solid #4285F4; /* Google Blue */
+    border-right: 2.5px solid #EA4335; /* Google Red */
+    border-bottom: 2.5px solid #FBBC05; /* Google Yellow */
+    border-left: 2.5px solid #34A853; /* Google Green */
+    border-radius: 50%;
+    animation: spinGoogle 0.75s linear infinite;
+    left: calc(50% - 9px);
+    top: calc(50% - 9px);
+    z-index: 2;
+}
+html.dark-theme .btn-google.loading::before {
+    border-color: rgba(255, 255, 255, 0.05);
+    border-top-color: #4285F4;
+    border-right-color: #EA4335;
+    border-bottom-color: #FBBC05;
+    border-left-color: #34A853;
+}
+.btn-google::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(to right, #4285F4 25%, #EA4335 25% 50%, #FBBC05 50% 75%, #34A853 75%);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
+    z-index: 1;
+}
+.btn-google.loading::after {
+    transform: scaleX(1);
+    animation: googleProgress 1.5s infinite linear;
+}
+@keyframes spinGoogle {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes googleProgress {
+    0% { transform: translateX(-100%) scaleX(1); }
+    50% { transform: translateX(0%) scaleX(1.5); }
+    100% { transform: translateX(100%) scaleX(1); }
+}
 
 .divider { display: flex; align-items: center; gap: 16px; margin: 4px 0; }
 .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border-color); }
